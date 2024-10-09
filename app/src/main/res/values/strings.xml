@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">GymApp</string>
+    <string name="l">L</string>
+    <string name="j">J</string>
+    <string name="m">M</string>
+    <string name="v">V</string>
+    <string name="s">S</string>
+    <string name="confirmar_reserva">Confirmar reserva</string>
+    <string name="d_a_lunes_25_de_septiembre">Día Lunes 25 de Septiembre</string>
+</resources>
