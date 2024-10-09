@@ -9,15 +9,12 @@ import com.example.gymapp.data.entity.Horario
 
 @Dao
 interface HorarioDao {
-    @Query("SELECT * FROM horarios")
-    fun getAll(): List<Horario>
+    @Query("SELECT * FROM horario WHERE dia_id = :diaId")
+    suspend fun getHorariosPorDia(diaId: Int): List<Horario>
 
     @Insert
-    fun insert(horario: Horario): Long
+    suspend fun insertHorario(horario: Horario)
 
-    @Update
-    fun update(horario: Horario)
-
-    @Delete
-    fun delete(horario: Horario)
+    @Query("UPDATE horario SET cupos_totales = :cupos WHERE id = :horarioId")
+    suspend fun actualizarCupos(horarioId: Int, cupos: Int)
 }

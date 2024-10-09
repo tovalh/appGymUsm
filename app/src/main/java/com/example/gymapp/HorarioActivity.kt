@@ -1,69 +1,95 @@
 package com.example.gymapp
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import android.view.View
 import android.widget.TextView
 import com.google.android.material.card.MaterialCardView
+import android.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
+import com.example.gymapp.data.database.AppDatabase
+import com.example.gymapp.data.relations.DiaConHorarios
+import kotlinx.coroutines.launch
+// Asegúrate de importar tus clases de Room (Repository, Database, etc.)
+import com.example.gymapp.data.repository.GymRepository
 
 class HorarioActivity : AppCompatActivity() {
 
     private lateinit var bottomNavigation: BottomNavigationView
+    private lateinit var repository: GymRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_horario)
+
+        // Inicializar el repository
+        val database = AppDatabase.getDatabase(this)
+        repository = GymRepository(database)
+
+        // Inicializar datos básicos
+        lifecycleScope.launch {
+            try {
+                repository.inicializarDatosBasicos()
+            } catch (e: Exception) {
+                // Manejar cualquier error de inicialización
+                e.printStackTrace()
+            }
+        }
 
         setupBottomNavigation()
         setupDayCards()
     }
 
     private fun setupBottomNavigation() {
-        bottomNavigation = findViewById(R.id.bottomNavigation)
-        bottomNavigation.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> {
-                    startActivity(Intent(this, HomeActivity::class.java))
-                    true
-                }
-                R.id.nav_calendar -> {
-                    // Navegar a ReservasActivity
-                    startActivity(Intent(this, ReservasActivity::class.java))
-                    true
-                }
-                R.id.nav_clock -> {
-                    true
-                }
-                else -> false
-            }
-        }
+        // Tu código existente de bottomNavigation
     }
 
     private fun setupDayCards() {
-        val days = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
-        val cardIds = listOf(R.id.mondayCard, R.id.tuesdayCard, R.id.wednesdayCard,
-            R.id.thursdayCard, R.id.fridayCard, R.id.saturdayCard)
+        val days = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado")
+        val daysInEnglish = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday")
+        val cardIds = listOf(
+            R.id.mondayCard, R.id.tuesdayCard, R.id.wednesdayCard,
+            R.id.thursdayCard, R.id.fridayCard, R.id.saturdayCard
+        )
 
         for (i in days.indices) {
             val cardView = findViewById<MaterialCardView>(cardIds[i])
             val dayTextView = cardView.findViewById<TextView>(R.id.dayText)
-            dayTextView.text = days[i]
-
-            // Configuración adicional del card...
+            dayTextView.text = daysInEnglish[i]
 
             cardView.setOnClickListener {
-                // Manejar el clic en la tarjeta
+                mostrarHorariosDelDia(days[i])
             }
         }
     }
 
-    // You might have additional methods here, such as:
-    // private fun getClassTimeForDay(day: String): String {
-    //     // Logic to return class times for a given day
-    // }
+    private fun mostrarHorariosDelDia(dia: String) {
+        lifecycleScope.launch {
+            try {
+                val diaConHorarios = repository.obtenerHorariosPorDia(dia)
+                diaConHorarios?.let {
+                    mostrarDialogoHorarios(it)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                // Mostrar un mensaje de error al usuario
+            }
+        }
+    }
 
-    // Additional methods for handling navigation, data loading, etc.
+    private fun mostrarDialogoHorarios(diaConHorarios: DiaConHorarios) {
+        val dialog = AlertDialog.Builder(this)
+        dialog.setTitle("Horarios para ${diaConHorarios.dia.nombre}")
+
+        // Crear la lista de horarios para mostrar
+        val horariosString = diaConHorarios.horarios.joinToString("\n") { horario ->
+            "${horario.hora} - Cupos disponibles: ${horario.cuposTotales}"
+        }
+
+        dialog.setMessage(horariosString)
+        dialog.setPositiveButton("Cerrar") { dialogInterface, _ ->
+            dialogInterface.dismiss()
+        }
+        dialog.show()
+    }
 }

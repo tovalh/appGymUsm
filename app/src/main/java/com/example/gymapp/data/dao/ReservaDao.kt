@@ -9,15 +9,15 @@ import com.example.gymapp.data.entity.Reserva
 
 @Dao
 interface ReservaDao {
-    @Query("SELECT * FROM reservas")
-    fun getAll(): List<Reserva>
+    @Query("SELECT * FROM reserva")
+    suspend fun getAllReservas(): List<Reserva>
 
     @Insert
-    fun insert(reserva: Reserva): Long
-
-    @Update
-    fun update(reserva: Reserva)
+    suspend fun insertReserva(reserva: Reserva)
 
     @Delete
-    fun delete(reserva: Reserva)
+    suspend fun deleteReserva(reserva: Reserva)
+
+    @Query("SELECT * FROM reserva WHERE fecha = :fecha")
+    suspend fun getReservasByFecha(fecha: String): List<Reserva>
 }
