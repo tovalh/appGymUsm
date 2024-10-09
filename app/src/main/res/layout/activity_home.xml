@@ -134,6 +134,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="88dp"
         android:text='"El esfuerzo de hoy es el éxito de mañana."'
+        android:textSize="16sp"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
