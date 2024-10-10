@@ -2,6 +2,7 @@ package com.example.gymapp
 
 import android.os.Bundle
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -86,6 +87,17 @@ class ReservasActivity : AppCompatActivity() {
                 ).show()
             }
         }
+
+        // Referenciar el TextView
+        val dateHeader: TextView = findViewById(R.id.dateHeader)
+
+        // Obtener la fecha actual
+        val today = LocalDate.now()
+        val formatter = DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM", Locale("es"))
+        val formattedDate = today.format(formatter)
+
+        // Asignar la fecha formateada al TextView
+        dateHeader.text = ("Dia " + formattedDate)
 
         // Configurar tabs
         tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
