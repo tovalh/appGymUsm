@@ -1,10 +1,14 @@
 package com.example.gymapp.data.repository
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.example.gymapp.data.database.AppDatabase
 import com.example.gymapp.data.entity.Dia
 import com.example.gymapp.data.entity.Disponibilidad
 import com.example.gymapp.data.relations.DiaConHorarios
 import com.example.gymapp.data.entity.Horario
+import java.time.LocalDate
+import java.time.temporal.ChronoField
 
 class GymRepository(private val database: AppDatabase) {
 
@@ -42,8 +46,8 @@ class GymRepository(private val database: AppDatabase) {
         return true
     }
 
-    suspend fun obtenerDisponibilidad(horarioId: Int): Boolean {
-//        return database.disponibilidadDao().getDisponibilidadPorHorario(horarioId)
-        return true
+    suspend fun obtenerDisponibilidad(horarioId: Int): Disponibilidad? {
+        val semanaActual = LocalDate.now().get(ChronoField.ALIGNED_WEEK_OF_YEAR)
+        return database.disponibilidadDao().getDisponibilidadPorHorario(horarioId, semanaActual)
     }
 }
