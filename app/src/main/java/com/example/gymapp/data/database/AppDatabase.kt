@@ -8,17 +8,20 @@ import com.example.gymapp.data.dao.DiaDao
 import com.example.gymapp.data.dao.DisponibilidadDao
 import com.example.gymapp.data.dao.HorarioDao
 import com.example.gymapp.data.dao.ReservaDao
+import com.example.gymapp.data.dao.UsuarioDao
 import com.example.gymapp.data.entity.Dia
 import com.example.gymapp.data.entity.Disponibilidad
 import com.example.gymapp.data.entity.Horario
 import com.example.gymapp.data.entity.Reserva
+import com.example.gymapp.data.entity.Usuario
 
 @Database(
     entities = [
         Dia::class,
         Horario::class,
         Disponibilidad::class,
-        Reserva::class
+        Reserva::class,
+        Usuario::class
     ],
     version = 1
 )
@@ -27,6 +30,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun horarioDao(): HorarioDao
     abstract fun disponibilidadDao(): DisponibilidadDao
     abstract fun reservaDao(): ReservaDao
+    abstract fun usuarioDao(): UsuarioDao
 
     companion object {
         @Volatile

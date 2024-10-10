@@ -149,7 +149,7 @@ class ReservasActivity : AppCompatActivity() {
                     timeSlots.add(
                         TimeSlot(
                             startTime = horario.hora,
-                            endTime = "", // Podrías calcular la hora de fin si lo necesitas
+                            endTime = "11:00", // Podrías calcular la hora de fin si lo necesitas
                             availableSpots = disponibilidad?.cuposDisponibles ?: horario.cuposTotales
                         )
                     )

@@ -4,20 +4,28 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Update
+import androidx.room.Transaction
 import com.example.gymapp.data.entity.Reserva
+import com.example.gymapp.data.relations.ReservaConDetalles
 
 @Dao
 interface ReservaDao {
-    @Query("SELECT * FROM reserva")
-    suspend fun getAllReservas(): List<Reserva>
+    @Transaction
+    @Query("SELECT * FROM reserva WHERE usuario_id = :usuarioId")
+    suspend fun getReservasByUsuario(usuarioId: Int): List<ReservaConDetalles>
+
+    @Transaction
+    @Query("""
+        SELECT * FROM reserva 
+        WHERE usuario_id = :usuarioId 
+        AND fecha = :fecha 
+        LIMIT 1
+    """)
+    suspend fun getReservaByUsuarioAndFecha(usuarioId: Int, fecha: String): ReservaConDetalles?
 
     @Insert
-    suspend fun insertReserva(reserva: Reserva)
+    suspend fun insert(reserva: Reserva): Long
 
     @Delete
-    suspend fun deleteReserva(reserva: Reserva)
-
-    @Query("SELECT * FROM reserva WHERE fecha = :fecha")
-    suspend fun getReservasByFecha(fecha: String): List<Reserva>
+    suspend fun delete(reserva: Reserva)
 }
