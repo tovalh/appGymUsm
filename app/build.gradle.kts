@@ -56,6 +56,9 @@ dependencies {
     kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
 
+    implementation'androidx.cardview:cardview:1.0.0'
+    implementation;'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation;'com.google.android.material:material:1.5.0'
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

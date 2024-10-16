@@ -4,166 +4,157 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    android:padding="16dp">
+    android:background="#FFFFFF">
+
+
 
     <TextView
-        android:id="@+id/tvGymName"
+        android:id="@+id/tvMyGym"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
         android:text="MyGym"
+        android:textColor="#000000"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
+        tools:ignore="MissingConstraints" />
 
     <TextView
-        android:id="@+id/tvNextReservation"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvProximaReserva"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="12dp"
+        android:background="#FDFDFD"
+        android:padding="16dp"
         android:text="Proxima reserva"
-        android:textColor="#040404"
-        android:textSize="24sp"
-        android:textStyle="bold"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvGymName" />
-
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginBottom="7dp"
-        android:background="@android:color/black"
-        app:layout_constraintBottom_toTopOf="@+id/tvReservationDay"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/tvMyGym" />
 
     <TextView
-        android:id="@+id/tvReservationDay"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvDiaLunes"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Día Lunes"
-        android:textColor="@color/primary_dark"
+        android:background="#FBFAFA"
+        android:padding="16dp"
+        android:text="Dia Lunes"
+        android:textAlignment="center"
+        android:textColor="#065F97"
         android:textSize="20sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvNextReservation" />
+        app:layout_constraintTop_toBottomOf="@+id/tvProximaReserva" />
 
     <TextView
-        android:id="@+id/tvReservationTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Bloque 10:35 - 11:15"
-        android:textColor="#070707"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvReservationDay" />
-
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_marginTop="28dp"
-        android:background="@android:color/black"
-        app:layout_constraintTop_toTopOf="@+id/tvReservationTime"
-        tools:layout_editor_absoluteX="16dp" />
-
-    <androidx.cardview.widget.CardView
-
-        android:id="@+id/cardAttendance"
+        android:id="@+id/tvBloque"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:background="@drawable/rounded_button"
-        app:cardBackgroundColor="@color/primary_dark"
-        app:cardCornerRadius="8dp"
+        android:background="#FDFDFD"
+        android:padding="16dp"
+        android:text="Bloque 10:35 - 11:15"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvReservationTime">
+        app:layout_constraintTop_toBottomOf="@+id/tvDiaLunes" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardViewAsistencia"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardBackgroundColor="#065F97"
+        app:cardCornerRadius="15dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvBloque">
 
         <LinearLayout
-            android:layout_width="363dp"
-            android:layout_height="match_parent"
-            android:backgroundTint="#EBEFEBEB"
+            android:layout_width="match_parent"
+            android:layout_height="280dp"
             android:orientation="vertical"
-
             android:padding="16dp">
 
             <TextView
-                android:layout_width="160dp"
-                android:layout_height="33dp"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
                 android:text="Has asistido un.."
-                android:textColor="#B8B7B7"
-                android:textSize="20sp" />
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/tvAttendancePercentage"
-                android:layout_width="339dp"
-                android:layout_height="246dp"
-                android:gravity="center"
-
+                android:layout_width="match_parent"
+                android:layout_height="180dp"
                 android:text="92%"
                 android:textAlignment="center"
-                android:textColor="@android:color/holo_orange_light"
-                android:textSize="144sp"
-                android:textStyle="bold"
-                android:typeface="monospace" />
+                android:textColor="#F7AE00"
+                android:textSize="115dp"
+                android:textStyle="bold" />
 
             <TextView
-                android:layout_width="324dp"
-                android:layout_height="41dp"
-                android:lineSpacingExtra="8sp"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
                 android:text="de tus clases."
                 android:textAlignment="textEnd"
-                android:textColor="#B8B7B7"
-                android:textSize="20sp" />
+                android:textColor="#FFFFFF"
+                android:textSize="18sp" />
+
         </LinearLayout>
+
     </androidx.cardview.widget.CardView>
 
     <TextView
-        android:id="@+id/tvMotivationalQuote"
-        android:layout_width="wrap_content"
+        android:id="@+id/tvQuote"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="88dp"
-        android:text='"El esfuerzo de hoy es el éxito de mañana."'
+        android:layout_margin="16dp"
+        android:layout_marginTop="80dp"
+        android:padding="16dp"
+        android:text="&quot;El esfuerzo de hoy es el éxito de mañana.&quot;"
+        android:textAlignment="center"
+        android:textColor="#000000"
         android:textSize="16sp"
         android:textStyle="italic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardAttendance" />
+        app:layout_constraintTop_toBottomOf="@+id/cardViewAsistencia" />
 
-    <Button
-        android:id="@+id/btnReserve"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="76dp"
-        android:background="@drawable/rounded_button"
-        android:backgroundTint="@color/accent"
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnReserva"
+        android:layout_width="300dp"
+        android:layout_height="60dp"
+        android:layout_margin="16dp"
         android:text="Reserva tu horario"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textStyle="bold"
+        app:backgroundTint="#FFA500"
+        app:cornerRadius="24dp"
         app:layout_constraintEnd_toEndOf="parent"
-
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/tvMotivationalQuote" />
+        app:layout_constraintTop_toBottomOf="@+id/tvQuote" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:background="?android:attr/windowBackground"
+        android:background="#065F97"
+        app:itemIconTint="@android:color/white"
+        app:itemTextColor="@android:color/white"
+        app:labelVisibilityMode="unlabeled"
+        app:menu="@menu/bottom_nav_menu"
+        style="@style/CustomBottomNavigationView"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:menu="@menu/bottom_nav_menu" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,15 +3,13 @@
     <item
         android:id="@+id/nav_home"
         android:icon="@drawable/ic_home"
-        android:title="Inicio" />
-
+        android:title=""/>
     <item
         android:id="@+id/nav_calendar"
         android:icon="@drawable/ic_calendario"
-        android:title="Calendario" />
-
+        android:title=""/>
     <item
         android:id="@+id/nav_clock"
         android:icon="@drawable/ic_reloj"
-        android:title="Horarios" />
+        android:title=""/>
 </menu>
