@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("kotlin-kapt")
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -52,13 +53,13 @@ android {
 }
 
 dependencies {
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
     implementation(libs.androidx.room.runtime)
+    implementation(libs.firebase.database.ktx)
+    implementation(libs.firebase.database)
     kapt(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
-
-    implementation'androidx.cardview:cardview:1.0.0'
-    implementation;'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation;'com.google.android.material:material:1.5.0'
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

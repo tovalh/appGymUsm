@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white">
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal">
+
+            <Button
+                android:id="@+id/btnLunes"
+                android:layout_width="55dp"
+                android:layout_height="58dp"
+                android:layout_margin="6dp"
+                android:background="@drawable/round_button"
+                android:fontFamily="@font/roboto_mono_medium"
+                android:text="L"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnMartes"
+                android:layout_width="55dp"
+                android:layout_height="58dp"
+                android:layout_margin="6dp"
+                android:background="@drawable/round_button"
+                android:text="M"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnMiercoles"
+                android:layout_width="55dp"
+                android:layout_height="58dp"
+                android:layout_margin="6dp"
+                android:background="@drawable/round_button"
+                android:text="M"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnJueves"
+                android:layout_width="55dp"
+                android:layout_height="58dp"
+                android:layout_margin="6dp"
+                android:background="@drawable/round_button"
+                android:text="J"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnViernes"
+                android:layout_width="55dp"
+                android:layout_height="58dp"
+                android:layout_margin="6dp"
+                android:background="@drawable/round_button"
+                android:text="V"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnSabado"
+                android:layout_width="55dp"
+                android:layout_height="58dp"
+                android:layout_margin="6dp"
+                android:background="@drawable/round_button"
+                android:text="S"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewTimeBlocks"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ConfirmabtnReserva"
+        android:layout_width="300dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:layout_margin="16dp"
+        android:background="@drawable/botonredondo"
+        android:fontFamily="@font/roboto_mono_medium"
+        android:text="Confirmar Reserva"
+        android:textAlignment="center"
+        android:textColor="#000000"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:backgroundTint="#FFA500"
+        app:cornerRadius="24dp"
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#065F97"
+        app:itemIconTint="@android:color/white"
+        app:itemTextColor="@android:color/white"
+        app:labelVisibilityMode="unlabeled"
+        app:menu="@menu/navbar"
+        app:itemIconSize="40dp" />
+
+</LinearLayout>

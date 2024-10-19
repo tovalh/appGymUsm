@@ -137,6 +137,7 @@
         android:textAlignment="center"
         android:textColor="#000000"
         android:textStyle="bold"
+        android:background="@drawable/botonredondo"
         app:backgroundTint="#FFA500"
         app:cornerRadius="24dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -145,16 +146,15 @@
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#065F97"
         app:itemIconTint="@android:color/white"
         app:itemTextColor="@android:color/white"
         app:labelVisibilityMode="unlabeled"
-        app:menu="@menu/bottom_nav_menu"
-        style="@style/CustomBottomNavigationView"
+        app:menu="@menu/navbar"
+        app:itemIconSize="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
