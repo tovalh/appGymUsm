@@ -3,12 +3,12 @@ package com.example.gymapp
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appgymusm.model.BloqueHorario
-import com.example.gymapp.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseReference
@@ -25,8 +25,8 @@ class ReservasActivity : AppCompatActivity() {
         FirebaseApp.initializeApp(this)
         initializeDatabase() // Inicializa la referencia a la base de datos de Firebase
         fetchMenuItems() // Obtiene los elementos del menú desde la base de datos
-        botonMenu()
-//        setupButtons() // Configura los listeners de clic para los botones
+        botonMenu()         // Navegacion barra menu abajo
+        setupButtons() // Configura los listeners de clic para los botones
     }
 
     private fun botonMenu() {
@@ -57,30 +57,89 @@ class ReservasActivity : AppCompatActivity() {
         database = FirebaseDatabase.getInstance().reference
     }
 
+    // Configura los listeners de clic para los botones de billetera, carrito y filtros
+    private fun setupButtons() {
+
+        findViewById<Button>(R.id.btnLunes).setOnClickListener {
+            filterbloqueHorarios("Lunes")
+        }
+
+        findViewById<Button>(R.id.btnMartes).setOnClickListener {
+            filterbloqueHorarios("Martes")
+        }
+
+        findViewById<Button>(R.id.btnMiercoles).setOnClickListener {
+            filterbloqueHorarios("Miercoles")
+        }
+
+        findViewById<Button>(R.id.btnJueves).setOnClickListener {
+            filterbloqueHorarios("Jueves")
+        }
+
+        findViewById<Button>(R.id.btnViernes).setOnClickListener {
+            filterbloqueHorarios("Viernes")
+        }
+
+        findViewById<Button>(R.id.btnSabado).setOnClickListener {
+            filterbloqueHorarios("Sabado")
+        }
+
+        findViewById<Button>(R.id.btnReserva).setOnClickListener {
+            confirmarReserva()
+        }
+    }
+
     // Obtienelos elementos del menú desde Firebase
     private fun fetchMenuItems() {
         database.child("bloqueHorarios").get().addOnSuccessListener { snapshot -> // Obtiene datos del nodo "menuItems"
             val bloques = mutableListOf<BloqueHorario>() // Crea una lista para almacenar los elementos del menú
             for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
                 val bloque = itemSnapshot.getValue(BloqueHorario::class.java) // Convierte los datos a un objeto MenuItem
-                if (bloque != null) {
+                if (bloque != null && bloque.dia == "Lunes") {
                     bloques.add(bloque) // Agrega el elemento del menú a la lista
                 }
             }
-//            updateUI(bloques) // Actualiza la interfaz de usuario con los elementos del menú obtenidos
+            updateUI(bloques) // Actualiza la interfaz de usuario con los elementos del menú obtenidos
         }.addOnFailureListener {
             Log.e("Firebase", "Error al obtener los datos", it) // Registra el error si falla la obtención de datos
             Toast.makeText(this, "Error al obtener los datos", Toast.LENGTH_SHORT).show() // Muestra un mensaje de error
         }
     }
 
-//    // Actualiza la interfaz de usuario con la lista de elementos del menú
-//    private fun updateUI(bloqueHorarios: List<BloqueHorario>) {
-//        val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewTimeBlocks) // Obtiene el RecyclerView
-//        recyclerView.layoutManager = LinearLayoutManager(this) // Establece el layout manager
-//        val adapter = MyAdapter(menuItems) { menuItem -> // Crea un adaptador para el RecyclerView
-//            addToCart(menuItem) // Agrega el elemento al carrito cuando se hace clic
-//        }
-//        recyclerView.adapter = adapter // Establece el adaptador para el RecyclerView
-//    }
+    // Actualiza la interfaz de usuario con la lista de elementos del menú
+    private fun updateUI(bloqueHorarios: List<BloqueHorario>) {
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewTimeBlocks) // Obtiene el RecyclerView
+        recyclerView.layoutManager = LinearLayoutManager(this) // Establece el layout manager
+        val adapter = MyAdapter(bloqueHorarios) { bloqueSeleccionado ->
+            // Aquí puedes hacer algo cuando se hace click en un bloque
+            // Por ejemplo, mostrar un Toast:
+            Toast.makeText(
+                this,
+                "Bloque seleccionado: ${bloqueSeleccionado.hora_inicio}",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        recyclerView.adapter = adapter
+    }
+    // Filtra los elementos del menú según la categoría seleccionada
+    private fun filterbloqueHorarios(dia: String) {
+        database.child("bloqueHorarios").get().addOnSuccessListener { snapshot -> // Obtiene datos del nodo "menuItems"
+            val bloques = mutableListOf<BloqueHorario>() // Crea una lista para almacenar los elementos del menú
+            for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
+                val bloque = itemSnapshot.getValue(BloqueHorario::class.java) // Convierte los datos a un objeto MenuItem
+                if (bloque != null && bloque.dia == dia) {
+                    bloques.add(bloque)
+                }
+
+            }
+            updateUI(bloques)
+        }.addOnFailureListener {
+            Log.e("Firebase", "Error al obtener los datos", it)
+            Toast.makeText(this, "Error al obtener los datos", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun confirmarReserva(){
+
+    }
 }
