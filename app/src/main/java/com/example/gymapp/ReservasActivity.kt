@@ -84,9 +84,6 @@ class ReservasActivity : AppCompatActivity() {
             filterbloqueHorarios("Sabado")
         }
 
-        findViewById<Button>(R.id.btnReserva).setOnClickListener {
-            confirmarReserva()
-        }
     }
 
     // Obtienelos elementos del menú desde Firebase
@@ -139,7 +136,7 @@ class ReservasActivity : AppCompatActivity() {
         }
     }
 
-    private fun confirmarReserva(){
-
-    }
+//    private fun confirmarReserva(){
+//
+//    }
 }
