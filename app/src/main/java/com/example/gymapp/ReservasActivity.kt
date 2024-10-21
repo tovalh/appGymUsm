@@ -17,17 +17,21 @@ import com.google.firebase.database.FirebaseDatabase
 class ReservasActivity : AppCompatActivity() {
 
     private lateinit var database: DatabaseReference
-
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: MyAdapter
+    private var selectedBloque: BloqueHorario? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.reserva_horario) // Establece el layout para esta actividad
         FirebaseApp.initializeApp(this)
         initializeDatabase() // Inicializa la referencia a la base de datos de Firebase
+        initializeRecyclerView() // inicializar RecyclerView
         fetchMenuItems() // Obtiene los elementos del menú desde la base de datos
         botonMenu()         // Navegacion barra menu abajo
         setupButtons() // Configura los listeners de clic para los botones
     }
+
 
     private fun botonMenu() {
         val menuNavegacion = findViewById<BottomNavigationView>(R.id.bottomNavigation)
@@ -52,9 +56,31 @@ class ReservasActivity : AppCompatActivity() {
         }
     }
 
+
+
     // Inicializa la referencia a la base de datos de Firebase
     private fun initializeDatabase() {
         database = FirebaseDatabase.getInstance().reference
+    }
+
+    // Recycler View vacio
+    private fun initializeRecyclerView() {
+        recyclerView = findViewById(R.id.recyclerViewTimeBlocks)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        adapter = MyAdapter(emptyList()) { bloqueSeleccionado ->
+            handleBloqueSelection(bloqueSeleccionado)
+        }
+        recyclerView.adapter = adapter
+    }
+
+    //Logica para bloque seleccionado
+    private fun handleBloqueSelection(bloqueSeleccionado: BloqueHorario) {
+        selectedBloque = bloqueSeleccionado
+        Toast.makeText(
+            this,
+            "Bloque seleccionado: ${bloqueSeleccionado.hora_inicio}",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     // Configura los listeners de clic para los botones de billetera, carrito y filtros
@@ -103,20 +129,9 @@ class ReservasActivity : AppCompatActivity() {
         }
     }
 
-    // Actualiza la interfaz de usuario con la lista de elementos del menú
+    // Actualiza la interfaz de usuario con la lista de elementos del Bloque
     private fun updateUI(bloqueHorarios: List<BloqueHorario>) {
-        val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewTimeBlocks) // Obtiene el RecyclerView
-        recyclerView.layoutManager = LinearLayoutManager(this) // Establece el layout manager
-        val adapter = MyAdapter(bloqueHorarios) { bloqueSeleccionado ->
-            // Aquí puedes hacer algo cuando se hace click en un bloque
-            // Por ejemplo, mostrar un Toast:
-            Toast.makeText(
-                this,
-                "Bloque seleccionado: ${bloqueSeleccionado.hora_inicio}",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
-        recyclerView.adapter = adapter
+        adapter.updateBloques(bloqueHorarios)
     }
     // Filtra los elementos del menú según la categoría seleccionada
     private fun filterbloqueHorarios(dia: String) {
