@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appgymusm.model.BloqueHorario
+import com.google.android.material.card.MaterialCardView
 
 class MyAdapter(
     private var bloquesList: List<BloqueHorario>,
@@ -31,17 +32,23 @@ class MyAdapter(
         holder.horaFinal.text = "Hasta: ${bloque.hora_final} - ${bloque.cupos_disponibles} cupos"
 
         // Cambiar el color de fondo según si está seleccionado o no
-        if (position == selectedPosition) {
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.selected_background))
-        } else {
-            holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.normal_background))
-        }
+        holder.cardView.setCardBackgroundColor(
+            ContextCompat.getColor(
+                holder.itemView.context,
+                if (position == selectedPosition) R.color.selected_background else R.color.normal_background
+            )
+        )
 
-        holder.itemView.setOnClickListener {
+
+        holder.cardView.setOnClickListener {
+            // Guardar el estado anterior
             val previousSelected = selectedPosition
+            // Actualizar la nueva posición seleccionada
             selectedPosition = holder.adapterPosition
+            // Notificar los cambios
             notifyItemChanged(previousSelected)
             notifyItemChanged(selectedPosition)
+            // Llamar al callback
             onBloqueClickCallback(bloque)
         }
 
@@ -49,6 +56,7 @@ class MyAdapter(
 
     fun updateBloques(newBloques: List<BloqueHorario>) {
         bloquesList = newBloques
+        selectedPosition = RecyclerView.NO_POSITION
         notifyDataSetChanged()
     }
 
@@ -56,6 +64,7 @@ class MyAdapter(
     override fun getItemCount(): Int = bloquesList.size
 
     class BloqueViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val cardView: MaterialCardView = itemView.findViewById(R.id.cardView)
         val horaInicio: TextView = itemView.findViewById(R.id.hora_inicio)
         val horaFinal: TextView = itemView.findViewById(R.id.hora_final)
     }
