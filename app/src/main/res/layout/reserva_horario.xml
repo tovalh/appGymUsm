@@ -84,7 +84,19 @@
                 android:textStyle="bold" />
 
         </LinearLayout>
+
+
     </HorizontalScrollView>
+    <TextView
+        android:id="@+id/txtDiaSemana"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:textColor="@android:color/black"
+        android:fontFamily="@font/roboto_mono_medium"
+        android:textSize="16sp"
+        android:layout_gravity="center_horizontal"
+        android:text="Selecciona un día de la semana" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewTimeBlocks"

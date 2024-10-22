@@ -15,7 +15,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
+
 
 
 class ReservasActivity : AppCompatActivity() {
@@ -47,19 +47,21 @@ class ReservasActivity : AppCompatActivity() {
                     startActivity(intentHome)
                     true
                 }
+
                 R.id.nav_calendar -> {
                     true
                 }
+
                 R.id.nav_clock -> {
                     val intentReloj = Intent(this, HorarioActivity::class.java)
                     startActivity(intentReloj)
                     true
                 }
+
                 else -> false
             }
         }
     }
-
 
 
     // Inicializa la referencia a la base de datos de Firebase
@@ -104,6 +106,7 @@ class ReservasActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnJueves).setOnClickListener {
             filterbloqueHorarios("Jueves")
+
         }
 
         findViewById<Button>(R.id.btnViernes).setOnClickListener {
@@ -123,18 +126,26 @@ class ReservasActivity : AppCompatActivity() {
 
     // Obtienelos elementos del menú desde Firebase
     private fun fetchMenuItems() {
-        database.child("bloqueHorarios").get().addOnSuccessListener { snapshot -> // Obtiene datos del nodo "menuItems"
-            val bloques = mutableListOf<BloqueHorario>() // Crea una lista para almacenar los elementos del menú
-            for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
-                val bloque = itemSnapshot.getValue(BloqueHorario::class.java) // Convierte los datos a un objeto MenuItem
-                if (bloque != null && bloque.dia == "Lunes") {
-                    bloques.add(bloque) // Agrega el elemento del menú a la lista
+        database.child("bloqueHorarios").get()
+            .addOnSuccessListener { snapshot -> // Obtiene datos del nodo "menuItems"
+                val bloques =
+                    mutableListOf<BloqueHorario>() // Crea una lista para almacenar los elementos del menú
+                for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
+                    val bloque =
+                        itemSnapshot.getValue(BloqueHorario::class.java) // Convierte los datos a un objeto MenuItem
+                    if (bloque != null && bloque.dia == "Lunes") {
+                        bloques.add(bloque) // Agrega el elemento del menú a la lista
+                    }
                 }
-            }
-            updateUI(bloques) // Actualiza la interfaz de usuario con los elementos del menú obtenidos
-        }.addOnFailureListener {
-            Log.e("Firebase", "Error al obtener los datos", it) // Registra el error si falla la obtención de datos
-            Toast.makeText(this, "Error al obtener los datos", Toast.LENGTH_SHORT).show() // Muestra un mensaje de error
+                updateUI(bloques) // Actualiza la interfaz de usuario con los elementos del menú obtenidos
+            }.addOnFailureListener {
+            Log.e(
+                "Firebase",
+                "Error al obtener los datos",
+                it
+            ) // Registra el error si falla la obtención de datos
+            Toast.makeText(this, "Error al obtener los datos", Toast.LENGTH_SHORT)
+                .show() // Muestra un mensaje de error
         }
     }
 
@@ -142,19 +153,23 @@ class ReservasActivity : AppCompatActivity() {
     private fun updateUI(bloqueHorarios: List<BloqueHorario>) {
         adapter.updateBloques(bloqueHorarios)
     }
+
     // Filtra los elementos del menú según la categoría seleccionada
     private fun filterbloqueHorarios(dia: String) {
-        database.child("bloqueHorarios").get().addOnSuccessListener { snapshot -> // Obtiene datos del nodo "menuItems"
-            val bloques = mutableListOf<BloqueHorario>() // Crea una lista para almacenar los elementos del menú
-            for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
-                val bloque = itemSnapshot.getValue(BloqueHorario::class.java) // Convierte los datos a un objeto MenuItem
-                if (bloque != null && bloque.dia == dia) {
-                    bloques.add(bloque)
-                }
+        database.child("bloqueHorarios").get()
+            .addOnSuccessListener { snapshot -> // Obtiene datos del nodo "menuItems"
+                val bloques =
+                    mutableListOf<BloqueHorario>() // Crea una lista para almacenar los elementos del menú
+                for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
+                    val bloque =
+                        itemSnapshot.getValue(BloqueHorario::class.java) // Convierte los datos a un objeto MenuItem
+                    if (bloque != null && bloque.dia == dia) {
+                        bloques.add(bloque)
+                    }
 
-            }
-            updateUI(bloques)
-        }.addOnFailureListener {
+                }
+                updateUI(bloques)
+            }.addOnFailureListener {
             Log.e("Firebase", "Error al obtener los datos", it)
             Toast.makeText(this, "Error al obtener los datos", Toast.LENGTH_SHORT).show()
         }
@@ -173,7 +188,7 @@ class ReservasActivity : AppCompatActivity() {
 
         // Si la diferencia es negativa (seleccionamos un día anterior al actual)
         if (diferencia < 0) {
-            diferencia += 6 // Suma 6 días para ir a la próxima semana
+            diferencia += 7 // Suma 7 días para ir a la próxima semana
         }
 
         // Añade los días de diferencia a la fecha actual y retorna la nueva fecha
@@ -183,7 +198,7 @@ class ReservasActivity : AppCompatActivity() {
     // Función que se ejecuta cuando se confirma una reserva
     private fun confirmarReserva() {
         // Convierte el día seleccionado de texto a número
-        val diaSeleccionado = when(selectedBloque?.dia) {
+        val diaSeleccionado = when (selectedBloque?.dia) {
             "Lunes" -> 1
             "Martes" -> 2
             "Miercoles" -> 3
@@ -197,7 +212,7 @@ class ReservasActivity : AppCompatActivity() {
         val fechaSeleccionada = calcularFechaSeleccionada(diaSeleccionado)
 
         // Define el formato de fecha que queremos (ejemplo: "21 de Octubre")
-        val formatoFecha = DateTimeFormatter.ofPattern("dd 'de' MMMM")
+        val formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         // Aplica el formato a la fecha seleccionada
         val fechaFormateada = fechaSeleccionada.format(formatoFecha)
 
@@ -205,26 +220,39 @@ class ReservasActivity : AppCompatActivity() {
         if (selectedBloque != null) {
             // Crea un mapa con todos los datos de la reserva
             val reservaMap = hashMapOf(
-                "fecha_reserva" to fechaFormateada,
-                "fecha_hora_creacion" to LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")),
+                "bloqueId" to "0",  // Puedes reemplazarlo con el ID correcto si tienes uno
+                "dia" to selectedBloque?.dia,
+                "fecha" to fechaFormateada,
                 "hora_inicio" to selectedBloque?.hora_inicio,
-                "hora_fin" to selectedBloque?.hora_final,
-                "dia" to selectedBloque?.dia
+                "hora_final" to selectedBloque?.hora_final
             )
 
-            // Guarda los datos en Firebase
+            // Obtiene la referencia al nodo del usuario (por ejemplo, usuario1)
+            val usuarioId = "usuario1"  // Cambia esto por el ID real del usuario si lo tienes
+
+            // Guarda los datos en Firebase bajo el nodo del usuario y su respectiva reserva
             database.child("reservas")
-                .push()  // Crea una nueva entrada
+                .child(usuarioId)  // Nodo del usuario
+                .child("reserva1")  // Nodo de la reserva (puedes generar un ID único para cada reserva si lo prefieres)
                 .setValue(reservaMap)  // Establece los valores
                 .addOnSuccessListener {  // Si se guarda correctamente
-                    Toast.makeText(this, "Reserva confirmada para: $fechaFormateada", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Reserva confirmada para: $fechaFormateada",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
                 .addOnFailureListener { e ->  // Si hay un error al guardar
-                    Toast.makeText(this, "Error al confirmar la reserva: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this,
+                        "Error al confirmar la reserva: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
         } else {
             // Si no se seleccionó ningún horario, muestra un mensaje de error
-            Toast.makeText(this, "Por favor, selecciona un horario primero", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Por favor, selecciona un horario primero", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 }
