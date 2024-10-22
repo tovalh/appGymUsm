@@ -11,8 +11,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.appgymusm.model.BloqueHorario
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ServerValue
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class ReservasActivity : AppCompatActivity() {
 
@@ -109,6 +114,11 @@ class ReservasActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btnSabado).setOnClickListener {
             filterbloqueHorarios("Sabado")
         }
+        // Agregar el nuevo botón de confirmar reserva
+        findViewById<Button>(R.id.ConfirmabtnReserva).setOnClickListener {
+            Log.d("ReservaDebug", "Botón confirmar presionado")
+            confirmarReserva()
+        }
 
     }
 
@@ -151,7 +161,98 @@ class ReservasActivity : AppCompatActivity() {
         }
     }
 
-//    private fun confirmarReserva(){
-//
-//    }
-}
+    private fun confirmarReserva() {
+        // Verificar si hay un bloque seleccionado
+        if (selectedBloque == null) {
+            Toast.makeText(this, "Por favor selecciona un horario", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Obtener el ID del usuario actual
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId == null) {
+            Toast.makeText(this, "Debes iniciar sesión para reservar", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Calcular la fecha para la reserva
+        val calendar = Calendar.getInstance()
+        val diaActual = calendar.get(Calendar.DAY_OF_WEEK)
+
+        // Mapear días de la semana a valores numéricos (Domingo = 1, Lunes = 2, ..., Sábado = 7)
+        val mapaDias = mapOf(
+            "Lunes" to 1,
+            "Martes" to 2,
+            "Miercoles" to 3,
+            "Jueves" to 4,
+            "Viernes" to 5,
+            "Sabado" to 6
+        )
+
+        val diaSeleccionadoNum = mapaDias[selectedBloque!!.dia] ?: return
+        var diferencia = diaSeleccionadoNum - diaActual
+
+        // Si la diferencia es negativa, añadir 7 días para ir a la próxima semana
+        if (diferencia < 0) {
+            diferencia += 7
+        }
+
+        // Establecer la fecha de reserva
+        calendar.add(Calendar.DAY_OF_YEAR, diferencia)
+        val formatoFecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val fechaFormateada = formatoFecha.format(calendar.time)
+
+        // Referencia a la base de datos de reservas
+        val reservasRef = database.child("reservas").child(userId)
+
+        // Crear objeto de reserva
+        val reserva = hashMapOf(
+            "dia" to selectedBloque!!.dia,
+            "fecha" to fechaFormateada,
+            "hora_inicio" to selectedBloque!!.hora_inicio,
+            "hora_fin" to selectedBloque!!.hora_final,
+            "timestamp" to ServerValue.TIMESTAMP
+        )
+
+        // Verificar si ya existe una reserva para ese día
+        reservasRef
+            .orderByChild("fecha")
+            .equalTo(fechaFormateada)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    Toast.makeText(
+                        this,
+                        "Ya tienes una reserva para el día $fechaFormateada",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    // Guardar la reserva en Firebase
+                    reservasRef.push().setValue(reserva)
+                        .addOnSuccessListener {
+                            Toast.makeText(
+                                this,
+                                "Reserva confirmada para el $fechaFormateada",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(
+                                this,
+                                "Error al confirmar la reserva: ${e.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                }
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(
+                    this,
+                    "Error al verificar reservas existentes: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+
+    }
+
+    }
