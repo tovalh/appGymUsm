@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,7 +16,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-
+import java.util.Locale
 
 
 class ReservasActivity : AppCompatActivity() {
@@ -67,6 +68,7 @@ class ReservasActivity : AppCompatActivity() {
     // Inicializa la referencia a la base de datos de Firebase
     private fun initializeDatabase() {
         database = FirebaseDatabase.getInstance().reference
+
     }
 
     // Recycler View vacio
@@ -92,30 +94,75 @@ class ReservasActivity : AppCompatActivity() {
     // Configura los listeners de clic para los botones de billetera, carrito y filtros
     private fun setupButtons() {
 
+        // Configurar el formato para que los meses aparezcan en español
+        val formatoFecha = DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES"))
+
         findViewById<Button>(R.id.btnLunes).setOnClickListener {
             filterbloqueHorarios("Lunes")
+
+            val fechaSeleccionada = calcularFechaSeleccionada(1) // 1 = Lunes
+            val fechaFormateada = fechaSeleccionada.format(formatoFecha)
+
+            // Actualiza el TextView con la fecha formateada
+            val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
+            txtFechaSeleccionada.text = "Lunes, $fechaFormateada"
         }
 
         findViewById<Button>(R.id.btnMartes).setOnClickListener {
             filterbloqueHorarios("Martes")
+
+            val fechaSeleccionada = calcularFechaSeleccionada(2) // 2 = Martes
+            val fechaFormateada = fechaSeleccionada.format(formatoFecha)
+
+            // Actualiza el TextView con la fecha formateada
+            val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
+            txtFechaSeleccionada.text = "Martes, $fechaFormateada"
         }
 
         findViewById<Button>(R.id.btnMiercoles).setOnClickListener {
             filterbloqueHorarios("Miercoles")
+
+            val fechaSeleccionada = calcularFechaSeleccionada(3) // 3 = Miércoles
+            val fechaFormateada = fechaSeleccionada.format(formatoFecha)
+
+            // Actualiza el TextView con la fecha formateada
+            val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
+            txtFechaSeleccionada.text = "Miércoles, $fechaFormateada"
         }
 
         findViewById<Button>(R.id.btnJueves).setOnClickListener {
             filterbloqueHorarios("Jueves")
 
+            val fechaSeleccionada = calcularFechaSeleccionada(4) // 4 = Jueves
+            val fechaFormateada = fechaSeleccionada.format(formatoFecha)
+
+            // Actualiza el TextView con la fecha formateada
+            val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
+            txtFechaSeleccionada.text = "Jueves, $fechaFormateada"
         }
 
         findViewById<Button>(R.id.btnViernes).setOnClickListener {
             filterbloqueHorarios("Viernes")
+
+            val fechaSeleccionada = calcularFechaSeleccionada(5) // 5 = Viernes
+            val fechaFormateada = fechaSeleccionada.format(formatoFecha)
+
+            // Actualiza el TextView con la fecha formateada
+            val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
+            txtFechaSeleccionada.text = "Viernes, $fechaFormateada"
         }
 
         findViewById<Button>(R.id.btnSabado).setOnClickListener {
             filterbloqueHorarios("Sabado")
+
+            val fechaSeleccionada = calcularFechaSeleccionada(6) // 6 = Sábado
+            val fechaFormateada = fechaSeleccionada.format(formatoFecha)
+
+            // Actualiza el TextView con la fecha formateada
+            val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
+            txtFechaSeleccionada.text = "Sábado, $fechaFormateada"
         }
+
         // Agregar el nuevo botón de confirmar reserva
         findViewById<Button>(R.id.ConfirmabtnReserva).setOnClickListener {
             Log.d("ReservaDebug", "Botón confirmar presionado")
@@ -210,17 +257,18 @@ class ReservasActivity : AppCompatActivity() {
 
         // Calcula la fecha del día seleccionado
         val fechaSeleccionada = calcularFechaSeleccionada(diaSeleccionado)
-
         // Define el formato de fecha que queremos (ejemplo: "21 de Octubre")
         val formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        val formatoFechaMensaje =  DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES"))
         // Aplica el formato a la fecha seleccionada
         val fechaFormateada = fechaSeleccionada.format(formatoFecha)
+        val fechaFormateadaMensaje = fechaSeleccionada.format(formatoFechaMensaje)
 
         // Verifica si se ha seleccionado un bloque horario
         if (selectedBloque != null) {
             // Crea un mapa con todos los datos de la reserva
             val reservaMap = hashMapOf(
-                "bloqueId" to "0",  // Puedes reemplazarlo con el ID correcto si tienes uno
+                //"bloqueId" to selectedBloque,  // Puedes reemplazarlo con el ID correcto si tienes uno
                 "dia" to selectedBloque?.dia,
                 "fecha" to fechaFormateada,
                 "hora_inicio" to selectedBloque?.hora_inicio,
@@ -233,12 +281,12 @@ class ReservasActivity : AppCompatActivity() {
             // Guarda los datos en Firebase bajo el nodo del usuario y su respectiva reserva
             database.child("reservas")
                 .child(usuarioId)  // Nodo del usuario
-                .child("reserva1")  // Nodo de la reserva (puedes generar un ID único para cada reserva si lo prefieres)
+                .push() // incremento de reserva
                 .setValue(reservaMap)  // Establece los valores
                 .addOnSuccessListener {  // Si se guarda correctamente
                     Toast.makeText(
                         this,
-                        "Reserva confirmada para: $fechaFormateada",
+                        "Reserva confirmada para: $fechaFormateadaMensaje",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
