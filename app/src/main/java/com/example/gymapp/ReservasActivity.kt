@@ -8,16 +8,15 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.appgymusm.model.BloqueHorario
+import com.example.gymapp.model.BloqueHorario
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ServerValue
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+
 
 class ReservasActivity : AppCompatActivity() {
 
@@ -161,98 +160,71 @@ class ReservasActivity : AppCompatActivity() {
         }
     }
 
-    private fun confirmarReserva() {
-        // Verificar si hay un bloque seleccionado
-        if (selectedBloque == null) {
-            Toast.makeText(this, "Por favor selecciona un horario", Toast.LENGTH_SHORT).show()
-            return
-        }
+    // Esta función recibe un número que representa el día de la semana (1=Lunes, 2=Martes, etc.)
+    private fun calcularFechaSeleccionada(diaSeleccionado: Int): LocalDateTime {
+        // Obtiene la fecha y hora actual del sistema
+        val fechaActual = LocalDateTime.now()
 
-        // Obtener el ID del usuario actual
-        val userId = FirebaseAuth.getInstance().currentUser?.uid
-        if (userId == null) {
-            Toast.makeText(this, "Debes iniciar sesión para reservar", Toast.LENGTH_SHORT).show()
-            return
-        }
+        // Obtiene el número del día de la semana actual (1-7)
+        val diaActual = fechaActual.dayOfWeek.value
 
-        // Calcular la fecha para la reserva
-        val calendar = Calendar.getInstance()
-        val diaActual = calendar.get(Calendar.DAY_OF_WEEK)
+        // Calcula cuántos días hay de diferencia entre el día seleccionado y el día actual
+        var diferencia = diaSeleccionado - diaActual
 
-        // Mapear días de la semana a valores numéricos (Domingo = 1, Lunes = 2, ..., Sábado = 7)
-        val mapaDias = mapOf(
-            "Lunes" to 1,
-            "Martes" to 2,
-            "Miercoles" to 3,
-            "Jueves" to 4,
-            "Viernes" to 5,
-            "Sabado" to 6
-        )
-
-        val diaSeleccionadoNum = mapaDias[selectedBloque!!.dia] ?: return
-        var diferencia = diaSeleccionadoNum - diaActual
-
-        // Si la diferencia es negativa, añadir 7 días para ir a la próxima semana
+        // Si la diferencia es negativa (seleccionamos un día anterior al actual)
         if (diferencia < 0) {
-            diferencia += 7
+            diferencia += 6 // Suma 6 días para ir a la próxima semana
         }
 
-        // Establecer la fecha de reserva
-        calendar.add(Calendar.DAY_OF_YEAR, diferencia)
-        val formatoFecha = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        val fechaFormateada = formatoFecha.format(calendar.time)
+        // Añade los días de diferencia a la fecha actual y retorna la nueva fecha
+        return fechaActual.plusDays(diferencia.toLong())
+    }
 
-        // Referencia a la base de datos de reservas
-        val reservasRef = database.child("reservas").child(userId)
+    // Función que se ejecuta cuando se confirma una reserva
+    private fun confirmarReserva() {
+        // Convierte el día seleccionado de texto a número
+        val diaSeleccionado = when(selectedBloque?.dia) {
+            "Lunes" -> 1
+            "Martes" -> 2
+            "Miercoles" -> 3
+            "Jueves" -> 4
+            "Viernes" -> 5
+            "Sabado" -> 6
+            else -> 1 // Si hay algún error, usa Lunes por defecto
+        }
 
-        // Crear objeto de reserva
-        val reserva = hashMapOf(
-            "dia" to selectedBloque!!.dia,
-            "fecha" to fechaFormateada,
-            "hora_inicio" to selectedBloque!!.hora_inicio,
-            "hora_fin" to selectedBloque!!.hora_final,
-            "timestamp" to ServerValue.TIMESTAMP
-        )
+        // Calcula la fecha del día seleccionado
+        val fechaSeleccionada = calcularFechaSeleccionada(diaSeleccionado)
 
-        // Verificar si ya existe una reserva para ese día
-        reservasRef
-            .orderByChild("fecha")
-            .equalTo(fechaFormateada)
-            .get()
-            .addOnSuccessListener { snapshot ->
-                if (snapshot.exists()) {
-                    Toast.makeText(
-                        this,
-                        "Ya tienes una reserva para el día $fechaFormateada",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    // Guardar la reserva en Firebase
-                    reservasRef.push().setValue(reserva)
-                        .addOnSuccessListener {
-                            Toast.makeText(
-                                this,
-                                "Reserva confirmada para el $fechaFormateada",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                        .addOnFailureListener { e ->
-                            Toast.makeText(
-                                this,
-                                "Error al confirmar la reserva: ${e.message}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+        // Define el formato de fecha que queremos (ejemplo: "21 de Octubre")
+        val formatoFecha = DateTimeFormatter.ofPattern("dd 'de' MMMM")
+        // Aplica el formato a la fecha seleccionada
+        val fechaFormateada = fechaSeleccionada.format(formatoFecha)
+
+        // Verifica si se ha seleccionado un bloque horario
+        if (selectedBloque != null) {
+            // Crea un mapa con todos los datos de la reserva
+            val reservaMap = hashMapOf(
+                "fecha_reserva" to fechaFormateada,
+                "fecha_hora_creacion" to LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss")),
+                "hora_inicio" to selectedBloque?.hora_inicio,
+                "hora_fin" to selectedBloque?.hora_final,
+                "dia" to selectedBloque?.dia
+            )
+
+            // Guarda los datos en Firebase
+            database.child("reservas")
+                .push()  // Crea una nueva entrada
+                .setValue(reservaMap)  // Establece los valores
+                .addOnSuccessListener {  // Si se guarda correctamente
+                    Toast.makeText(this, "Reserva confirmada para: $fechaFormateada", Toast.LENGTH_SHORT).show()
                 }
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(
-                    this,
-                    "Error al verificar reservas existentes: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
-
+                .addOnFailureListener { e ->  // Si hay un error al guardar
+                    Toast.makeText(this, "Error al confirmar la reserva: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+        } else {
+            // Si no se seleccionó ningún horario, muestra un mensaje de error
+            Toast.makeText(this, "Por favor, selecciona un horario primero", Toast.LENGTH_SHORT).show()
+        }
     }
-
-    }
+}
