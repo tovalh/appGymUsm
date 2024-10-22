@@ -1,4 +1,4 @@
-package com.example.appgymusm.model
+package com.example.gymapp.model
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
