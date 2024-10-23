@@ -42,14 +42,13 @@ class ReservasActivity : AppCompatActivity() {
 
         val fechaActual = LocalDateTime.now()
         val diaActual = fechaActual.dayOfWeek.value
-
         val formatoFecha = DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM", Locale("es", "ES"))
-        val fechaSeleccionada = calcularFechaSeleccionada(diaActual) // 1 = Lunes
+        val fechaSeleccionada = calcularFechaSeleccionada(diaActual)
         val fechaFormateada = fechaSeleccionada.format(formatoFecha)
 
         // Actualiza el TextView con la fecha formateada
         val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
-        txtFechaSeleccionada.text = "Lunes, $fechaFormateada"
+        txtFechaSeleccionada.text = "$fechaFormateada"
     }
 
     private fun botonMenu() {
@@ -187,12 +186,19 @@ class ReservasActivity : AppCompatActivity() {
 
     // Obtienelos elementos del menú desde Firebase
     private fun fetchMenuItems() {
+        val fechaActual = LocalDateTime.now()
+        val diaActual = fechaActual.dayOfWeek.value // Obtiene el número del día actual (1=Lunes, ..., 7=Domingo)
+        // Mapea los días de la semana a los nombres que tienes en la base de datos
+        val diasDeLaSemana = listOf("Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sábado")
+        // Obtén el nombre del día correspondiente
+        val diaSeleccionado = diasDeLaSemana[diaActual - 1] // Resta 1 porque la lista comienza en 0
+
         database.child("bloqueHorarios").get()
             .addOnSuccessListener { snapshot -> // Obtiene datos del nodo "bloqueHorarios"
                 val bloques = mutableListOf<BloqueHorario>() // Crea una lista para almacenar los bloques horarios
                 for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
                     val bloque = itemSnapshot.getValue(BloqueHorario::class.java) // Convierte los datos a un objeto BloqueHorario
-                    if (bloque != null && bloque.dia == "Lunes") { // Verifica si el bloque es válido y si es Lunes
+                    if (bloque != null && bloque.dia == "$diaSeleccionado") { // Verifica si el bloque es válido y si es Lunes
                         bloque.id = itemSnapshot.key ?: "" // Asigna la clave del nodo al objeto
                         bloques.add(bloque) // Agrega el bloque horario a la lista
                     }
