@@ -44,7 +44,7 @@ class HorarioActivity: AppCompatActivity(){
             val reservasLista = mutableListOf<Reserva>() // Crea una lista para almacenar los elementos del menú
             for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
                 val reserva = itemSnapshot.getValue(Reserva::class.java) // Convierte los datos a un objeto MenuItem
-                if (reserva != null) {
+                if (reserva != null && reserva.estado == "activo") {
                     reservasLista.add(reserva) // Agrega el elemento del menú a la lista
                 }
             }
@@ -81,6 +81,7 @@ class HorarioActivity: AppCompatActivity(){
                 Toast.makeText(this, "Error al cancelar la reserva", Toast.LENGTH_SHORT).show()
                 Log.e("Firebase", "Error al cancelar la reserva", it)
             }
+        fetchMenuItems()
     }
 
     private fun botonMenu() {
