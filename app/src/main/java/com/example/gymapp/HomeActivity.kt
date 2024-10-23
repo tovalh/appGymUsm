@@ -23,6 +23,7 @@ class HomeActivity : AppCompatActivity() {
         setupButtons()
         mostrarFraseAleatoria()
         botonMenu()
+        actualizarProximaReserva()
     }
     private fun initializeDatabase() {
         database = FirebaseDatabase.getInstance().reference
@@ -84,5 +85,14 @@ class HomeActivity : AppCompatActivity() {
             Log.e("Firebase", "Error al obtener frases", error)
             tvFrase.text = "\"El esfuerzo de hoy es el éxito de mañana.\""  // Frase por defecto
         }
+    }
+
+    private fun actualizarProximaReserva() {
+        // Referencia a los TextViews
+
+        val tvBloque = findViewById<TextView>(R.id.tvBloque)
+        val tvDiaLunes = findViewById<TextView>(R.id.tvDiaLunes)
+
+
     }
 }

@@ -244,7 +244,7 @@ class ReservasActivity : AppCompatActivity() {
 
     // Función que se ejecuta cuando se confirma una reserva
     private fun confirmarReserva() {
-        // Convierte el día seleccionado de texto a número
+        // Convierte el día seleccionado (texto) a su número correspondiente (1-6)
         val diaSeleccionado = when (selectedBloque?.dia) {
             "Lunes" -> 1
             "Martes" -> 2
@@ -252,53 +252,65 @@ class ReservasActivity : AppCompatActivity() {
             "Jueves" -> 4
             "Viernes" -> 5
             "Sabado" -> 6
-            else -> 1 // Si hay algún error, usa Lunes por defecto
+            else -> 1  // Valor por defecto en caso de error
         }
 
-        // Calcula la fecha del día seleccionado
+        // Obtiene la fecha seleccionada usando la función auxiliar calcularFechaSeleccionada
         val fechaSeleccionada = calcularFechaSeleccionada(diaSeleccionado)
-        // Define el formato de fecha que queremos (ejemplo: "21 de Octubre")
-        val formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-        val formatoFechaMensaje =  DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES"))
-        // Aplica el formato a la fecha seleccionada
+
+        // Define el formato de fecha para guardar en Firebase (yyyy-MM-dd)
+        val formatoFecha = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+
+        // Define el formato de fecha para mostrar en el mensaje al usuario (21 de Octubre)
+        val formatoFechaMensaje = DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES"))
+
+        // Aplica los formatos a la fecha seleccionada
         val fechaFormateada = fechaSeleccionada.format(formatoFecha)
         val fechaFormateadaMensaje = fechaSeleccionada.format(formatoFechaMensaje)
 
-        // Verifica si se ha seleccionado un bloque horario
+        // Verifica que se haya seleccionado un bloque horario
         if (selectedBloque != null) {
-            // Crea un mapa con todos los datos de la reserva
-            val reservaMap = hashMapOf(
-                //"bloqueId" to selectedBloque,  // Puedes reemplazarlo con el ID correcto si tienes uno
-                "dia" to selectedBloque?.dia,
-                "fecha" to fechaFormateada,
-                "hora_inicio" to selectedBloque?.hora_inicio,
-                "hora_final" to selectedBloque?.hora_final
-            )
+            // Consulta a Firebase para obtener el número de reservas existentes
+            database.child("reservas")  // Accede al nodo "reservas"
+                .child("usuario1")      // Accede al nodo del usuario específico
+                .get()                  // Obtiene los datos
+                .addOnSuccessListener { snapshot ->
+                    // Calcula el número de la siguiente reserva (total actual + 1)
+                    val sumaReserva = snapshot.childrenCount + 1 //cuenta cuántas reservas ya existen dentro del nodo "usuario1" en Firebase.
 
-            // Obtiene la referencia al nodo del usuario (por ejemplo, usuario1)
-            val usuarioId = "usuario1"  // Cambia esto por el ID real del usuario si lo tienes
+                    // Crea un mapa con los datos de la reserva exactamente como se necesitan
+                    val reservaMap = hashMapOf(
+                        "bloqueId" to "0",                    // ID fijo como "0"
+                        "dia" to selectedBloque?.dia,         // Día seleccionado (Lunes, Martes, etc.)
+                        "fecha" to fechaFormateada,           // Fecha en formato yyyy-MM-dd
+                        "hora_final" to selectedBloque?.hora_final,     // Hora de fin del bloque
+                        "hora_inicio" to selectedBloque?.hora_inicio    // Hora de inicio del bloque
+                    )
 
-            // Guarda los datos en Firebase bajo el nodo del usuario y su respectiva reserva
-            database.child("reservas")
-                .child(usuarioId)  // Nodo del usuario
-                .push() // incremento de reserva
-                .setValue(reservaMap)  // Establece los valores
-                .addOnSuccessListener {  // Si se guarda correctamente
-                    Toast.makeText(
-                        this,
-                        "Reserva confirmada para: $fechaFormateadaMensaje",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-                .addOnFailureListener { e ->  // Si hay un error al guardar
-                    Toast.makeText(
-                        this,
-                        "Error al confirmar la reserva: ${e.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    // Guarda la reserva en Firebase
+                    database.child("reservas")
+                        .child("usuario1")                    // Nodo del usuario
+                        .child("reserva$sumaReserva")      // Crea el nodo reserva1, reserva2, etc.
+                        .setValue(reservaMap)                 // Establece los valores de la reserva
+                        .addOnSuccessListener {
+                            // Si la operación fue exitosa, muestra mensaje de éxito
+                            Toast.makeText(
+                                this,
+                                "Reserva confirmada para: $fechaFormateadaMensaje",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        .addOnFailureListener { e ->
+                            // Si hubo un error, muestra mensaje de error
+                            Toast.makeText(
+                                this,
+                                "Error al confirmar la reserva: ${e.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                 }
         } else {
-            // Si no se seleccionó ningún horario, muestra un mensaje de error
+            // Si no se seleccionó ningún bloque, muestra mensaje de error
             Toast.makeText(this, "Por favor, selecciona un horario primero", Toast.LENGTH_SHORT)
                 .show()
         }
