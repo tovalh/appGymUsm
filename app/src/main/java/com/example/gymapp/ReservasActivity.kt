@@ -35,12 +35,16 @@ class ReservasActivity : AppCompatActivity() {
         fetchMenuItems() // Obtiene los elementos del menú desde la base de datos
         botonMenu()         // Navegacion barra menu abajo
         setupButtons() // Configura los listeners de clic para los botones
+        bloquearBotones()
         initializeTextView()// Inicializa el textview en dia lunes
     }
     private fun initializeTextView(){
 
-        val formatoFecha = DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES"))
-        val fechaSeleccionada = calcularFechaSeleccionada(1) // 1 = Lunes
+        val fechaActual = LocalDateTime.now()
+        val diaActual = fechaActual.dayOfWeek.value
+
+        val formatoFecha = DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM", Locale("es", "ES"))
+        val fechaSeleccionada = calcularFechaSeleccionada(diaActual) // 1 = Lunes
         val fechaFormateada = fechaSeleccionada.format(formatoFecha)
 
         // Actualiza el TextView con la fecha formateada
@@ -250,6 +254,50 @@ class ReservasActivity : AppCompatActivity() {
         // Añade los días de diferencia a la fecha actual y retorna la nueva fecha
         return fechaActual.plusDays(diferencia.toLong())
     }
+
+    //Funcion para bloquear botones antes de Hoy
+    private fun bloquearBotones(){
+
+        val fechaActual = LocalDateTime.now()
+        val diaActual = fechaActual.dayOfWeek.value
+
+        // referencias a los botones
+        val btnLunes = findViewById<Button>(R.id.btnLunes)
+        val btnMartes = findViewById<Button>(R.id.btnMartes)
+        val btnMiercoles = findViewById<Button>(R.id.btnMiercoles)
+        val btnJueves = findViewById<Button>(R.id.btnJueves)
+        val btnViernes = findViewById<Button>(R.id.btnViernes)
+
+        // Deshabilitar los botones según el día actual
+        when (diaActual) {
+            2 -> btnLunes.isEnabled = false
+            3 -> {
+                btnLunes.isEnabled = false
+                btnMartes.isEnabled = false
+            }
+            4 -> {
+                btnLunes.isEnabled = false
+                btnMartes.isEnabled = false
+                btnMiercoles.isEnabled = false
+            }
+            5 -> {
+                btnLunes.isEnabled = false
+                btnMartes.isEnabled = false
+                btnMiercoles.isEnabled = false
+                btnJueves.isEnabled = false
+            }
+            6 -> {
+                btnLunes.isEnabled = false
+                btnMartes.isEnabled = false
+                btnMiercoles.isEnabled = false
+                btnJueves.isEnabled = false
+                btnViernes.isEnabled = false
+            }
+        }
+
+
+    }
+
 
     // Función que se ejecuta cuando se confirma una reserva
     private fun confirmarReserva() {
