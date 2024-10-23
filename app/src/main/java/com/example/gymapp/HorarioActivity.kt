@@ -6,8 +6,10 @@ import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.core.snap
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.gymapp.model.BloqueHorario
 import com.example.gymapp.model.Reserva
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
@@ -40,7 +42,7 @@ class HorarioActivity: AppCompatActivity(){
     private fun fetchMenuItems() {
         database.child("reservas")
             .child("usuario1")
-            .get().addOnSuccessListener { snapshot -> // Obtiene datos del nodo "menuItems"
+            .get().addOnSuccessListener { snapshot -> // Obtiene datos del nodo
             val reservasLista = mutableListOf<Reserva>() // Crea una lista para almacenar los elementos del menú
             for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
                 val reserva = itemSnapshot.getValue(Reserva::class.java) // Convierte los datos a un objeto MenuItem
@@ -73,7 +75,7 @@ class HorarioActivity: AppCompatActivity(){
             .child("usuario1")
             .child(reserva.id) // Aquí deberías tener una forma de identificar la reserva específica
             .child("estado")
-            .setValue("cancelado")
+            .setValue("Cancelada")
             .addOnSuccessListener {
                 Toast.makeText(this, "Reserva cancelada exitosamente", Toast.LENGTH_SHORT).show()
                 fetchMenuItems() // Recargar la lista de reservas
@@ -82,8 +84,37 @@ class HorarioActivity: AppCompatActivity(){
                 Toast.makeText(this, "Error al cancelar la reserva", Toast.LENGTH_SHORT).show()
                 Log.e("Firebase", "Error al cancelar la reserva", it)
             }
+        restaurarCupo(reserva)
         fetchMenuItems()
     }
+
+    private fun restaurarCupo(reserva: Reserva) {
+
+        database.child("bloqueHorarios").get()
+            .addOnSuccessListener { snapshot ->
+                val bloques =
+                    mutableListOf<BloqueHorario>()
+                for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
+                    val bloque =
+                        itemSnapshot.getValue(BloqueHorario::class.java)
+                    if (bloque != null && bloque.dia == reserva.dia && bloque.hora_inicio == reserva.hora_inicio) {
+                        // Loopea otra vez hasta encontrar el bloque correcto!!
+                        database.child("bloqueHorarios")
+                            .child(itemSnapshot.key ?: "") // Usamos la key del bloque
+                            .child("cupos_disponibles")
+                            .setValue(bloque.cupos_disponibles + 1)
+                            .addOnSuccessListener {
+                                Log.d("Firebase", "Cupo restaurado exitosamente")
+                            }
+                            .addOnFailureListener { error ->
+                                Log.e("Firebase", "Error al restaurar cupo", error)
+                            }
+                        break
+                    }
+                }
+            }
+    }
+
 
     private fun botonMenu() {
         val menuNavegacion = findViewById<BottomNavigationView>(R.id.bottomNavigation)
