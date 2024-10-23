@@ -17,7 +17,8 @@ data class BloqueHorario(
     override val dia: String = "",
     override val hora_inicio: String = "",
     override val hora_final: String = "",
-    override val cupos_disponibles: Int = 0
+    override val cupos_disponibles: Int = 0,
+    val estadoReserva: String = ""
 ) : Item(dia, hora_inicio, hora_final, cupos_disponibles)
 
 // Clase para representar un bloque horario en el carrito

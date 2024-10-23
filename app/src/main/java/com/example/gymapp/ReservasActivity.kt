@@ -233,14 +233,15 @@ class ReservasActivity : AppCompatActivity() {
                     val horaInicio = itemSnapshot.child("hora_inicio").getValue(String::class.java) ?: "" // Obtiene la hora de inicio
                     val horaFinal = itemSnapshot.child("hora_final").getValue(String::class.java) ?: "" // Obtiene la hora final
                     val cuposDisponibles = itemSnapshot.child("cupos_disponibles").getValue(Int::class.java) ?: 0 // Obtiene los cupos disponibles
-
+                    val estadoReserva = itemSnapshot.child("estadoReserva").getValue(String::class.java)?: ""
                     // Crea un nuevo objeto BloqueHorario con los datos extraídos
                     val bloque = BloqueHorario(
                         id = id,
                         dia = diaBloque,
                         hora_inicio = horaInicio,
                         hora_final = horaFinal,
-                        cupos_disponibles = cuposDisponibles
+                        cupos_disponibles = cuposDisponibles,
+                        estadoReserva = estadoReserva
                     )
 
                     // Filtra los bloques para que solo se agreguen los del día especificado con cupos disponibles
@@ -347,13 +348,14 @@ class ReservasActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { snapshot -> // Listener que se ejecuta si la consulta tiene éxito
                 val sumaReserva = snapshot.childrenCount + 1 // Cuenta el número de reservas existentes y suma 1 para la nueva
-
+                val estadoReservadefault = "Activo"
                 // Crea un mapa con los detalles de la reserva
                 val reservaMap = hashMapOf(
                     "dia" to selectedBloque?.dia,
                     "fecha" to fechaFormateada,
                     "hora_final" to selectedBloque?.hora_final,
-                    "hora_inicio" to selectedBloque?.hora_inicio
+                    "hora_inicio" to selectedBloque?.hora_inicio,
+                    "estado" to estadoReservadefault
                 )
 
                 // Añade la nueva reserva a la base de datos
