@@ -11,8 +11,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class HomeActivity : AppCompatActivity() {
 
@@ -93,12 +95,13 @@ class HomeActivity : AppCompatActivity() {
 
     private fun actualizarProximaReserva() {
         // Referencia a los TextViews
-
         val tvBloque = findViewById<TextView>(R.id.tvBloque)
         val tvDiaLunes = findViewById<TextView>(R.id.tvDiaLunes)
 
-        val formatoFecha = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-        val fechaHoy = fechaActual.format(formatoFecha)
+        // Formato de fecha "día de mes" en español
+        val formatoFecha = DateTimeFormatter.ofPattern("d 'de' MMMM", Locale("es", "ES"))
+        val formatoFechaHoy = DateTimeFormatter.ofPattern("yyyy-MM-dd") // Para comparar con Firebase
+        val fechaHoy = fechaActual.format(formatoFechaHoy)
         val userId = "usuario1"
 
         database.child("reservas").child(userId)
@@ -113,8 +116,13 @@ class HomeActivity : AppCompatActivity() {
                     val reserva = reservaSnapshot.getValue(Reserva::class.java)
 
                     reserva?.let {
-                        tvBloque.text = "Bloque: ${it.hora_inicio} - ${it.hora_final}"
-                        tvDiaLunes.text = "Día: ${it.dia} ${it.fecha}"
+                        tvBloque.text = "Bloque ${it.hora_inicio} - ${it.hora_final}"
+
+                        // Parsear la fecha de la reserva al formato deseado
+                        val fechaReserva = LocalDate.parse(it.fecha, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                        val fechaFormateada = fechaReserva.format(formatoFecha)
+
+                        tvDiaLunes.text = "${it.dia} $fechaFormateada"
                     }
                 } else {
                     tvBloque.text = "No hay reservas próximas"
