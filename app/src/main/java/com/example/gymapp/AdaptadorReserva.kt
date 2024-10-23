@@ -3,6 +3,7 @@ package com.example.gymapp
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -11,7 +12,7 @@ import com.example.gymapp.model.Reserva
 
 class AdaptadorReserva(
     private val reservaLista: List<Reserva>,
-    private val addToCartCallback: (Reserva) -> Unit
+    private val onCancelClick: (Reserva) -> Unit
 ) : RecyclerView.Adapter<AdaptadorReserva.MyViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -35,6 +36,7 @@ class AdaptadorReserva(
         val dia: TextView = itemView.findViewById(R.id.dia)
         val horario: TextView = itemView.findViewById(R.id.horario)
         val fecha: TextView = itemView.findViewById(R.id.fecha)
+        val btnCancelar: Button = itemView.findViewById(R.id.btnCancelar)
     }
     }
 

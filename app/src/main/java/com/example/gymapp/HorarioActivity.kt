@@ -61,10 +61,26 @@ class HorarioActivity: AppCompatActivity(){
     private fun updateUI(reservasLista: List<Reserva>) {
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewDays) // Obtiene el RecyclerView
         recyclerView.layoutManager = LinearLayoutManager(this) // Establece el layout manager
-        val adapter = AdaptadorReserva(reservasLista) { reserva -> // Crea un adaptador para el RecyclerView
-//            addToCart(menuItem) // Agrega el elemento al carrito cuando se hace clic
+        val adapter = AdaptadorReserva(reservasLista) { reserva ->
+            cancelarReserva(reserva)
         }
         recyclerView.adapter = adapter // Establece el adaptador para el RecyclerView
+    }
+    private fun cancelarReserva(reserva: Reserva) {
+        // Usamos la estructura correcta del JSON para actualizar
+        database.child("reservas")
+            .child("usuario1")
+            .child("reserva2") // Aquí deberías tener una forma de identificar la reserva específica
+            .child("estado")
+            .setValue("cancelado")
+            .addOnSuccessListener {
+                Toast.makeText(this, "Reserva cancelada exitosamente", Toast.LENGTH_SHORT).show()
+                fetchMenuItems() // Recargar la lista de reservas
+            }
+            .addOnFailureListener {
+                Toast.makeText(this, "Error al cancelar la reserva", Toast.LENGTH_SHORT).show()
+                Log.e("Firebase", "Error al cancelar la reserva", it)
+            }
     }
 
     private fun botonMenu() {
