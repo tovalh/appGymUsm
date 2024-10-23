@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -30,13 +31,17 @@ class AdaptadorReserva(
         holder.dia.text = reserva.dia
         holder.fecha.text = reserva.fecha
 
+        holder.btnCancelar.setOnClickListener {
+            onCancelClick(reserva)
+        }
+
         }
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val dia: TextView = itemView.findViewById(R.id.dia)
         val horario: TextView = itemView.findViewById(R.id.horario)
         val fecha: TextView = itemView.findViewById(R.id.fecha)
-        val btnCancelar: Button = itemView.findViewById(R.id.btnCancelar)
+        val btnCancelar: ImageButton = itemView.findViewById(R.id.btnCancelar)
     }
     }
 
