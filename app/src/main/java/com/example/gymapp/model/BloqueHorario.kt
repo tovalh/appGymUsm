@@ -13,7 +13,7 @@ open class Item(
 
 // Clase para representar un bloque horario
 data class BloqueHorario(
-    val id: String = "",
+    var id: String = "",
     override val dia: String = "",
     override val hora_inicio: String = "",
     override val hora_final: String = "",

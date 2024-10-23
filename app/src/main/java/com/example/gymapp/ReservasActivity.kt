@@ -183,36 +183,25 @@ class ReservasActivity : AppCompatActivity() {
 
     // Obtienelos elementos del menú desde Firebase
     private fun fetchMenuItems() {
-        // Realiza una consulta a la base de datos Firebase para obtener los datos de "bloqueHorarios"
         database.child("bloqueHorarios").get()
-            .addOnSuccessListener { snapshot -> // Listener que se ejecuta si la consulta tiene éxito
-                val bloques = mutableListOf<BloqueHorario>() // Lista mutable para almacenar los bloques horarios
-                for (itemSnapshot in snapshot.children) { // Itera sobre cada hijo en el snapshot
-                    val id = itemSnapshot.key ?: "" // Obtiene el ID del nodo (bloque horario)
-                    val dia = itemSnapshot.child("dia").getValue(String::class.java) ?: "" // Obtiene el día
-                    val horaInicio = itemSnapshot.child("hora_inicio").getValue(String::class.java) ?: "" // Obtiene la hora de inicio
-                    val horaFinal = itemSnapshot.child("hora_final").getValue(String::class.java) ?: "" // Obtiene la hora final
-                    val cuposDisponibles = itemSnapshot.child("cupos_disponibles").getValue(Int::class.java) ?: 0 // Obtiene los cupos disponibles
-
-                    // Crea un nuevo objeto BloqueHorario con los datos extraídos
-                    val bloque = BloqueHorario(
-                        id = id,
-                        dia = dia,
-                        hora_inicio = horaInicio,
-                        hora_final = horaFinal,
-                        cupos_disponibles = cuposDisponibles
-                    )
-
-                    // Filtra los bloques para que solo se agreguen los del día "Lunes" con cupos disponibles
-                    if (bloque.dia == "Lunes" && bloque.cupos_disponibles > 0) {
-                        bloques.add(bloque) // Añade el bloque a la lista
+            .addOnSuccessListener { snapshot -> // Obtiene datos del nodo "bloqueHorarios"
+                val bloques = mutableListOf<BloqueHorario>() // Crea una lista para almacenar los bloques horarios
+                for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
+                    val bloque = itemSnapshot.getValue(BloqueHorario::class.java) // Convierte los datos a un objeto BloqueHorario
+                    if (bloque != null && bloque.dia == "Lunes") { // Verifica si el bloque es válido y si es Lunes
+                        bloque.id = itemSnapshot.key ?: "" // Asigna la clave del nodo al objeto
+                        bloques.add(bloque) // Agrega el bloque horario a la lista
                     }
                 }
-                updateUI(bloques) // Actualiza la interfaz de usuario con los bloques filtrados
+                updateUI(bloques) // Actualiza la interfaz de usuario con los elementos del menú obtenidos
             }.addOnFailureListener {
-                // Listener que se ejecuta si la consulta falla
-                Log.e("Firebase", "Error al obtener los datos", it) // Registra el error
-                Toast.makeText(this, "Error al obtener los datos", Toast.LENGTH_SHORT).show() // Muestra un mensaje de error
+                Log.e(
+                    "Firebase",
+                    "Error al obtener los datos",
+                    it
+                ) // Registra el error si falla la obtención de datos
+                Toast.makeText(this, "Error al obtener los datos", Toast.LENGTH_SHORT)
+                    .show() // Muestra un mensaje de error
             }
     }
 
@@ -228,31 +217,16 @@ class ReservasActivity : AppCompatActivity() {
             .addOnSuccessListener { snapshot -> // Listener que se ejecuta si la consulta tiene éxito
                 val bloques = mutableListOf<BloqueHorario>() // Lista mutable para almacenar los bloques horarios
                 for (itemSnapshot in snapshot.children) { // Itera sobre cada hijo en el snapshot
-                    val id = itemSnapshot.key ?: "" // Obtiene el ID del nodo (bloque horario)
-                    val diaBloque = itemSnapshot.child("dia").getValue(String::class.java) ?: "" // Obtiene el día
-                    val horaInicio = itemSnapshot.child("hora_inicio").getValue(String::class.java) ?: "" // Obtiene la hora de inicio
-                    val horaFinal = itemSnapshot.child("hora_final").getValue(String::class.java) ?: "" // Obtiene la hora final
-                    val cuposDisponibles = itemSnapshot.child("cupos_disponibles").getValue(Int::class.java) ?: 0 // Obtiene los cupos disponibles
-                    val estadoReserva = itemSnapshot.child("estadoReserva").getValue(String::class.java)?: ""
-                    // Crea un nuevo objeto BloqueHorario con los datos extraídos
-                    val bloque = BloqueHorario(
-                        id = id,
-                        dia = diaBloque,
-                        hora_inicio = horaInicio,
-                        hora_final = horaFinal,
-                        cupos_disponibles = cuposDisponibles,
-                        estadoReserva = estadoReserva
-                    )
-
-                    // Filtra los bloques para que solo se agreguen los del día especificado con cupos disponibles
-                    if (bloque.dia == dia && bloque.cupos_disponibles > 0) {
-                        bloques.add(bloque) // Añade el bloque a la lista
+                    val bloque = itemSnapshot.getValue(BloqueHorario::class.java) // Convierte los datos a un objeto BloqueHorario
+                    if (bloque != null && bloque.dia == dia && bloque.cupos_disponibles > 0) { // Verifica si el bloque es válido y tiene cupos disponibles
+                        bloque.id = itemSnapshot.key ?: "" // Asigna la clave del nodo al objeto
+                        bloques.add(bloque) // Agrega el bloque a la lista
                     }
                 }
                 updateUI(bloques) // Actualiza la interfaz de usuario con los bloques filtrados
-            }.addOnFailureListener {
+            }.addOnFailureListener { exception ->
                 // Listener que se ejecuta si la consulta falla
-                Log.e("Firebase", "Error al obtener los datos", it) // Registra el error
+                Log.e("Firebase", "Error al obtener los datos", exception) // Registra el error
                 Toast.makeText(this, "Error al obtener los datos", Toast.LENGTH_SHORT).show() // Muestra un mensaje de error
             }
     }
