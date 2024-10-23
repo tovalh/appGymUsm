@@ -35,8 +35,18 @@ class ReservasActivity : AppCompatActivity() {
         fetchMenuItems() // Obtiene los elementos del menú desde la base de datos
         botonMenu()         // Navegacion barra menu abajo
         setupButtons() // Configura los listeners de clic para los botones
+        initializeTextView()// Inicializa el textview en dia lunes
     }
+    private fun initializeTextView(){
 
+        val formatoFecha = DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES"))
+        val fechaSeleccionada = calcularFechaSeleccionada(1) // 1 = Lunes
+        val fechaFormateada = fechaSeleccionada.format(formatoFecha)
+
+        // Actualiza el TextView con la fecha formateada
+        val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
+        txtFechaSeleccionada.text = "Lunes, $fechaFormateada"
+    }
 
     private fun botonMenu() {
         val menuNavegacion = findViewById<BottomNavigationView>(R.id.bottomNavigation)
@@ -280,7 +290,7 @@ class ReservasActivity : AppCompatActivity() {
 
                     // Crea un mapa con los datos de la reserva exactamente como se necesitan
                     val reservaMap = hashMapOf(
-                        "bloqueId" to "0",                    // ID fijo como "0"
+                        // ID fijo como "0"
                         "dia" to selectedBloque?.dia,         // Día seleccionado (Lunes, Martes, etc.)
                         "fecha" to fechaFormateada,           // Fecha en formato yyyy-MM-dd
                         "hora_final" to selectedBloque?.hora_final,     // Hora de fin del bloque
