@@ -44,7 +44,8 @@ class HorarioActivity: AppCompatActivity(){
             val reservasLista = mutableListOf<Reserva>() // Crea una lista para almacenar los elementos del menú
             for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
                 val reserva = itemSnapshot.getValue(Reserva::class.java) // Convierte los datos a un objeto MenuItem
-                if (reserva != null && reserva.estado == "activo") {
+                if (reserva != null && reserva.estado == "Activo") {
+                    reserva.id = itemSnapshot.key ?: ""
                     reservasLista.add(reserva) // Agrega el elemento del menú a la lista
                 }
             }
@@ -70,7 +71,7 @@ class HorarioActivity: AppCompatActivity(){
         // Usamos la estructura correcta del JSON para actualizar
         database.child("reservas")
             .child("usuario1")
-            .child("reserva2") // Aquí deberías tener una forma de identificar la reserva específica
+            .child(reserva.id) // Aquí deberías tener una forma de identificar la reserva específica
             .child("estado")
             .setValue("cancelado")
             .addOnSuccessListener {

@@ -27,7 +27,7 @@ class AdaptadorReserva(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val reserva = reservaLista[position]
-        holder.horario.text = "${reserva.hora_inicio} - (${reserva.hora_final})"
+        holder.horario.text = "${reserva.hora_inicio} - ${reserva.hora_final}"
         holder.dia.text = reserva.dia
         holder.fecha.text = reserva.fecha
 
