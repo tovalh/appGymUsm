@@ -42,13 +42,23 @@ class ReservasActivity : AppCompatActivity() {
 
         val fechaActual = LocalDateTime.now()
         val diaActual = fechaActual.dayOfWeek.value
-        val formatoFecha = DateTimeFormatter.ofPattern("EEEE, dd 'de' MMMM", Locale("es", "ES"))
+
+        // Mapea los días de la semana a los nombres que tienes en la base de datos
+        val diasDeLaSemana = listOf("Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado")
+        // Obtén el nombre del día correspondiente
+        val diaSeleccionado = diasDeLaSemana[diaActual -1] // Resta 1 porque la lista comienza en 0
+        // Formato para la fecha completa (ej.  23 de octubre")
+        val formatoFecha = DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES"))
+        // Calcula la fecha seleccionada, aquí asumimos que `calcularFechaSeleccionada` devuelve un LocalDate
         val fechaSeleccionada = calcularFechaSeleccionada(diaActual)
+
+    // Formatea la fecha seleccionada
         val fechaFormateada = fechaSeleccionada.format(formatoFecha)
 
-        // Actualiza el TextView con la fecha formateada
+// Actualiza el TextView con la fecha formateada
         val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
-        txtFechaSeleccionada.text = "$fechaFormateada"
+        txtFechaSeleccionada.text = "$diaSeleccionado, $fechaFormateada"
+
     }
 
     private fun botonMenu() {
@@ -140,7 +150,7 @@ class ReservasActivity : AppCompatActivity() {
 
             // Actualiza el TextView con la fecha formateada
             val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
-            txtFechaSeleccionada.text = "Miércoles, $fechaFormateada"
+            txtFechaSeleccionada.text = "Miercoles, $fechaFormateada"
         }
 
         findViewById<Button>(R.id.btnJueves).setOnClickListener {
@@ -173,7 +183,7 @@ class ReservasActivity : AppCompatActivity() {
 
             // Actualiza el TextView con la fecha formateada
             val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
-            txtFechaSeleccionada.text = "Sábado, $fechaFormateada"
+            txtFechaSeleccionada.text = "Sabado, $fechaFormateada"
         }
 
         // Agregar el nuevo botón de confirmar reserva
