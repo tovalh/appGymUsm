@@ -6,7 +6,8 @@ open class ReservaItem(
     open val dia: String = "",
     open val hora_inicio: String = "",
     open val hora_final: String = "",
-    open val fecha: String = ""
+    open val fecha: String = "",
+    open val estado: String
 )
 
 // Clase para representar una reserva
@@ -15,5 +16,6 @@ data class Reserva(
     override val dia: String = "",
     override val hora_inicio: String = "",
     override val hora_final: String = "",
-    override val fecha: String = ""
-) : ReservaItem(bloqueId, dia, hora_inicio, hora_final, fecha)
+    override val fecha: String = "",
+    override val estado: String = ""
+) : ReservaItem(bloqueId, dia, hora_inicio, hora_final, fecha,estado)

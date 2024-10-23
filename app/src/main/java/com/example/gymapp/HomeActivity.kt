@@ -6,14 +6,18 @@ import android.util.Log
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.gymapp.model.Reserva
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var database: DatabaseReference
+    val fechaActual = LocalDateTime.now()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -93,6 +97,34 @@ class HomeActivity : AppCompatActivity() {
         val tvBloque = findViewById<TextView>(R.id.tvBloque)
         val tvDiaLunes = findViewById<TextView>(R.id.tvDiaLunes)
 
+        val formatoFecha = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val fechaHoy = fechaActual.format(formatoFecha)
+        val userId = "usuario1"
 
+        database.child("reservas").child(userId)
+            .orderByChild("fecha")
+            .startAt(fechaHoy)
+            .limitToFirst(1)
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    // Obtener la primera reserva
+                    val reservaSnapshot = snapshot.children.first()
+                    val reserva = reservaSnapshot.getValue(Reserva::class.java)
+
+                    reserva?.let {
+                        tvBloque.text = "Bloque: ${it.hora_inicio} - ${it.hora_final}"
+                        tvDiaLunes.text = "Día: ${it.dia} ${it.fecha}"
+                    }
+                } else {
+                    tvBloque.text = "No hay reservas próximas"
+                    tvDiaLunes.text = ""
+                }
+            }
+            .addOnFailureListener { error ->
+                Log.e("Firebase", "Error al obtener reserva próxima", error)
+                tvBloque.text = "Error al cargar reserva"
+                tvDiaLunes.text = ""
+            }
     }
 }

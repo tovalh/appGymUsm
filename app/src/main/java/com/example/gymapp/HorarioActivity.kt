@@ -17,6 +17,8 @@ import com.google.firebase.database.FirebaseDatabase
 class HorarioActivity: AppCompatActivity(){
 
     private lateinit var database: DatabaseReference
+
+    // Esto es necesario??
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: AdaptadorReserva
 
@@ -46,6 +48,8 @@ class HorarioActivity: AppCompatActivity(){
                     reservasLista.add(reserva) // Agrega el elemento del menú a la lista
                 }
             }
+                // Ordenar la lista por fecha antes de actualizar la UI
+            reservasLista.sortBy { it.fecha }
             updateUI(reservasLista) // Actualiza la interfaz de usuario con los elementos del menú obtenidos
         }.addOnFailureListener {
             Log.e("Firebase", "Error al obtener los datos", it) // Registra el error si falla la obtención de datos

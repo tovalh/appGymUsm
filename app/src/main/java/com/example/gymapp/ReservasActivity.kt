@@ -180,7 +180,7 @@ class ReservasActivity : AppCompatActivity() {
                 for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
                     val bloque =
                         itemSnapshot.getValue(BloqueHorario::class.java) // Convierte los datos a un objeto MenuItem
-                    if (bloque != null && bloque.dia == "Lunes") {
+                    if (bloque != null && bloque.dia == "Lunes" && bloque.cupos_disponibles > 0) {
                         bloques.add(bloque) // Agrega el elemento del menú a la lista
                     }
                 }
@@ -210,7 +210,7 @@ class ReservasActivity : AppCompatActivity() {
                 for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
                     val bloque =
                         itemSnapshot.getValue(BloqueHorario::class.java) // Convierte los datos a un objeto MenuItem
-                    if (bloque != null && bloque.dia == dia) {
+                    if (bloque != null && bloque.dia == dia && bloque.cupos_disponibles > 0) {
                         bloques.add(bloque)
                     }
 
