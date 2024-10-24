@@ -2,4 +2,5 @@
 <resources>
     <color name="selected_background">#E0E0E0</color> <!-- Gris claro para el fondo seleccionado -->
     <color name="normal_background">#FFFFFF</color> <!-- Blanco para el fondo normal -->
+    <color name="Azul_usm">#065F97</color>
 </resources>

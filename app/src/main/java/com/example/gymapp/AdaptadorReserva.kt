@@ -27,15 +27,15 @@ class AdaptadorReserva(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val reserva = reservaLista[position]
-        holder.horario.text = "${reserva.hora_inicio} - ${reserva.hora_final}"
-        holder.dia.text = reserva.dia
+        holder.dia.text = "Dia ${reserva.dia}"
+        holder.horario.text = "Bloque ${reserva.hora_inicio} - ${reserva.hora_final}"
         holder.fecha.text = reserva.fecha
 
         holder.btnCancelar.setOnClickListener {
             onCancelClick(reserva)
         }
 
-        }
+    }
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val dia: TextView = itemView.findViewById(R.id.dia)
@@ -43,9 +43,4 @@ class AdaptadorReserva(
         val fecha: TextView = itemView.findViewById(R.id.fecha)
         val btnCancelar: ImageButton = itemView.findViewById(R.id.btnCancelar)
     }
-    }
-
-
-
-
-
+}

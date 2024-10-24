@@ -15,7 +15,7 @@ class MyAdapter(
     private val onBloqueClickCallback: (BloqueHorario) -> Unit
 ) : RecyclerView.Adapter<MyAdapter.BloqueViewHolder>() {
 
-// Posicion para guardar el seleccionado
+    // Posicion para guardar el seleccionado
     private var selectedPosition = RecyclerView.NO_POSITION
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BloqueViewHolder {
@@ -25,11 +25,14 @@ class MyAdapter(
     }
 
     override fun onBindViewHolder(holder: BloqueViewHolder, position: Int) {
+
         val bloque = bloquesList[position]
 
         // Formatear el texto para mostrar la hora y los cupos disponibles
-        holder.horaInicio.text = "${bloque.hora_inicio} (${bloque.dia})"
-        holder.horaFinal.text = "Hasta: ${bloque.hora_final} - ${bloque.cupos_disponibles} cupos"
+        holder.titulo.text = "${bloque.dia}"
+        holder.bloqueHorario.text = "${bloque.hora_inicio} - ${bloque.hora_final}"
+        holder.cupos.text = "Cupos:${bloque.cupos_disponibles} "
+
 
         // Cambiar el color de fondo según si está seleccionado o no
         holder.cardView.setCardBackgroundColor(
@@ -65,7 +68,9 @@ class MyAdapter(
 
     class BloqueViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val cardView: MaterialCardView = itemView.findViewById(R.id.cardView)
-        val horaInicio: TextView = itemView.findViewById(R.id.hora_inicio)
-        val horaFinal: TextView = itemView.findViewById(R.id.hora_final)
+        val titulo: TextView = itemView.findViewById(R.id.dia)
+        val bloqueHorario: TextView = itemView.findViewById(R.id.horario)
+        val cupos: TextView = itemView.findViewById(R.id.cupos)
+
     }
 }

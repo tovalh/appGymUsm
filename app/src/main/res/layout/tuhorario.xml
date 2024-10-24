@@ -9,14 +9,16 @@
     <TextView
         android:id="@+id/btnWeeklySchedule"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="wrap_content"
         android:layout_margin="16dp"
-        android:background="@drawable/botonredondoazul"
+        android:background="@drawable/tituloazul"
         android:fontFamily="@font/roboto_mono_medium"
         android:text="Tu Horario semanal"
         android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:textSize="32sp" />
+        android:textSize="23dp"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewDays"
@@ -35,7 +37,6 @@
         app:menu="@menu/navbar"
         app:itemIconSize="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"/>
 
 </LinearLayout>

@@ -20,9 +20,6 @@ class HorarioActivity: AppCompatActivity(){
 
     private lateinit var database: DatabaseReference
 
-    // Esto es necesario??
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: AdaptadorReserva
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gymapp.model.BloqueHorario
@@ -57,7 +58,7 @@ class ReservasActivity : AppCompatActivity() {
 
 // Actualiza el TextView con la fecha formateada
         val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
-        txtFechaSeleccionada.text = "$diaSeleccionado, $fechaFormateada"
+        txtFechaSeleccionada.text = "Día $diaSeleccionado $fechaFormateada"
 
     }
 
@@ -97,7 +98,7 @@ class ReservasActivity : AppCompatActivity() {
     // Recycler View vacio
     private fun initializeRecyclerView() {
         recyclerView = findViewById(R.id.recyclerViewTimeBlocks)
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.layoutManager = GridLayoutManager(this, 2)
         adapter = MyAdapter(emptyList()) { bloqueSeleccionado ->
             handleBloqueSelection(bloqueSeleccionado)
         }
