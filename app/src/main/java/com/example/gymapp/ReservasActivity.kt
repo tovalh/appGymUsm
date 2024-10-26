@@ -1,5 +1,6 @@
 package com.example.gymapp
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -26,19 +27,29 @@ class ReservasActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: MyAdapter
     private var selectedBloque: BloqueHorario? = null
+    private var currentDaySelected: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.reserva_horario) // Establece el layout para esta actividad
+        setContentView(R.layout.reserva_horario)
         FirebaseApp.initializeApp(this)
-        initializeDatabase() // Inicializa la referencia a la base de datos de Firebase
-        initializeRecyclerView() // inicializar RecyclerView
-        fetchMenuItems() // Obtiene los elementos del menú desde la base de datos
-        botonMenu()         // Navegacion barra menu abajo
-        setupButtons() // Configura los listeners de clic para los botones
+        initializeDatabase()
+        initializeRecyclerView()
+
+        // Inicializar con el día actual
+        val fechaActual = LocalDateTime.now()
+        val diaActual = fechaActual.dayOfWeek.value
+        val diasDeLaSemana = listOf("Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado")
+        currentDaySelected = diasDeLaSemana[diaActual - 1]
+
+        fetchMenuItems() // Carga inicial con el día actual
+        botonMenu()
+        setupButtons()
+
         bloquearBotones()
-        initializeTextView()// Inicializa el textview en dia lunes
     }
+
+    @SuppressLint("SetTextI18n")
     private fun initializeTextView(){
 
         val fechaActual = LocalDateTime.now()
@@ -115,116 +126,81 @@ class ReservasActivity : AppCompatActivity() {
         ).show()
     }
 
+    @SuppressLint("SetTextI18n")
+    private fun actualizarTextViewFecha(dia: String) {
+        val diaNumerico = when (dia) {
+            "Lunes" -> 1
+            "Martes" -> 2
+            "Miercoles" -> 3
+            "Jueves" -> 4
+            "Viernes" -> 5
+            "Sabado" -> 6
+            else -> 1
+        }
+
+        val fechaSeleccionada = calcularFechaSeleccionada(diaNumerico)
+        val formatoFecha = DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES"))
+        val fechaFormateada = fechaSeleccionada.format(formatoFecha)
+
+        val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
+        txtFechaSeleccionada.text = "Día $dia $fechaFormateada"
+    }
+
     // Configura los listeners de clic para los botones de billetera, carrito y filtros
     private fun setupButtons() {
-
-        // Configurar el formato para que los meses aparezcan en español
-        val formatoFecha = DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES"))
-
         findViewById<Button>(R.id.btnLunes).setOnClickListener {
             filterbloqueHorarios("Lunes")
-
-            val fechaSeleccionada = calcularFechaSeleccionada(1) // 1 = Lunes
-            val fechaFormateada = fechaSeleccionada.format(formatoFecha)
-
-            // Actualiza el TextView con la fecha formateada
-            val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
-            txtFechaSeleccionada.text = "Lunes, $fechaFormateada"
         }
 
         findViewById<Button>(R.id.btnMartes).setOnClickListener {
             filterbloqueHorarios("Martes")
-
-            val fechaSeleccionada = calcularFechaSeleccionada(2) // 2 = Martes
-            val fechaFormateada = fechaSeleccionada.format(formatoFecha)
-
-            // Actualiza el TextView con la fecha formateada
-            val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
-            txtFechaSeleccionada.text = "Martes, $fechaFormateada"
         }
 
         findViewById<Button>(R.id.btnMiercoles).setOnClickListener {
             filterbloqueHorarios("Miercoles")
-
-            val fechaSeleccionada = calcularFechaSeleccionada(3) // 3 = Miércoles
-            val fechaFormateada = fechaSeleccionada.format(formatoFecha)
-
-            // Actualiza el TextView con la fecha formateada
-            val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
-            txtFechaSeleccionada.text = "Miercoles, $fechaFormateada"
         }
 
         findViewById<Button>(R.id.btnJueves).setOnClickListener {
             filterbloqueHorarios("Jueves")
-
-            val fechaSeleccionada = calcularFechaSeleccionada(4) // 4 = Jueves
-            val fechaFormateada = fechaSeleccionada.format(formatoFecha)
-
-            // Actualiza el TextView con la fecha formateada
-            val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
-            txtFechaSeleccionada.text = "Jueves, $fechaFormateada"
         }
 
         findViewById<Button>(R.id.btnViernes).setOnClickListener {
             filterbloqueHorarios("Viernes")
-
-            val fechaSeleccionada = calcularFechaSeleccionada(5) // 5 = Viernes
-            val fechaFormateada = fechaSeleccionada.format(formatoFecha)
-
-            // Actualiza el TextView con la fecha formateada
-            val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
-            txtFechaSeleccionada.text = "Viernes, $fechaFormateada"
         }
 
         findViewById<Button>(R.id.btnSabado).setOnClickListener {
             filterbloqueHorarios("Sabado")
-
-            val fechaSeleccionada = calcularFechaSeleccionada(6) // 6 = Sábado
-            val fechaFormateada = fechaSeleccionada.format(formatoFecha)
-
-            // Actualiza el TextView con la fecha formateada
-            val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
-            txtFechaSeleccionada.text = "Sabado, $fechaFormateada"
         }
 
-        // Agregar el nuevo botón de confirmar reserva
         findViewById<Button>(R.id.ConfirmabtnReserva).setOnClickListener {
-            Log.d("ReservaDebug", "Botón confirmar presionado")
             confirmarReserva()
         }
-
     }
 
     // Obtienelos elementos del menú desde Firebase
     private fun fetchMenuItems() {
-        val fechaActual = LocalDateTime.now()
-        val diaActual = fechaActual.dayOfWeek.value // Obtiene el número del día actual (1=Lunes, ..., 7=Domingo)
-        // Mapea los días de la semana a los nombres que tienes en la base de datos
-        val diasDeLaSemana = listOf("Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sábado")
-        // Obtén el nombre del día correspondiente
-        val diaSeleccionado = diasDeLaSemana[diaActual - 1] // Resta 1 porque la lista comienza en 0
-
         database.child("bloqueHorarios").get()
-            .addOnSuccessListener { snapshot -> // Obtiene datos del nodo "bloqueHorarios"
-                val bloques = mutableListOf<BloqueHorario>() // Crea una lista para almacenar los bloques horarios
-                for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
-                    val bloque = itemSnapshot.getValue(BloqueHorario::class.java) // Convierte los datos a un objeto BloqueHorario
-                    if (bloque != null && bloque.dia == "$diaSeleccionado") { // Verifica si el bloque es válido y si es Lunes
-                        bloque.id = itemSnapshot.key ?: "" // Asigna la clave del nodo al objeto
-                        bloques.add(bloque) // Agrega el bloque horario a la lista
+            .addOnSuccessListener { snapshot ->
+                val bloques = mutableListOf<BloqueHorario>()
+                for (itemSnapshot in snapshot.children) {
+                    val bloque = itemSnapshot.getValue(BloqueHorario::class.java)
+                    if (bloque != null && bloque.dia == currentDaySelected) {
+                        bloque.id = itemSnapshot.key ?: ""
+                        if (bloque.cupos_disponibles > 0) {
+                            bloques.add(bloque)
+                        }
                     }
                 }
-                updateUI(bloques) // Actualiza la interfaz de usuario con los elementos del menú obtenidos
-            }.addOnFailureListener {
-                Log.e(
-                    "Firebase",
-                    "Error al obtener los datos",
-                    it
-                ) // Registra el error si falla la obtención de datos
-                Toast.makeText(this, "Error al obtener los datos", Toast.LENGTH_SHORT)
-                    .show() // Muestra un mensaje de error
+                updateUI(bloques)
+
+                // Actualizar el TextView con la fecha correspondiente
+                actualizarTextViewFecha(currentDaySelected)
+            }.addOnFailureListener { exception ->
+                Log.e("Firebase", "Error al obtener los datos", exception)
+                Toast.makeText(this, "Error al obtener los datos", Toast.LENGTH_SHORT).show()
             }
     }
+
 
     // Actualiza la interfaz de usuario con la lista de elementos del bloque
     private fun updateUI(bloqueHorarios: List<BloqueHorario>) {
@@ -233,24 +209,30 @@ class ReservasActivity : AppCompatActivity() {
 
     //  filterBloqueHorarios para incluir el ID
     private fun filterbloqueHorarios(dia: String) {
-        // Realiza una consulta a la base de datos Firebase para obtener los datos de "bloqueHorarios"
+        currentDaySelected = dia // Actualizar el día seleccionado
+
         database.child("bloqueHorarios").get()
-            .addOnSuccessListener { snapshot -> // Listener que se ejecuta si la consulta tiene éxito
-                val bloques = mutableListOf<BloqueHorario>() // Lista mutable para almacenar los bloques horarios
-                for (itemSnapshot in snapshot.children) { // Itera sobre cada hijo en el snapshot
-                    val bloque = itemSnapshot.getValue(BloqueHorario::class.java) // Convierte los datos a un objeto BloqueHorario
-                    if (bloque != null && bloque.dia == dia && bloque.cupos_disponibles > 0) { // Verifica si el bloque es válido y tiene cupos disponibles
-                        bloque.id = itemSnapshot.key ?: "" // Asigna la clave del nodo al objeto
-                        bloques.add(bloque) // Agrega el bloque a la lista
+            .addOnSuccessListener { snapshot ->
+                val bloques = mutableListOf<BloqueHorario>()
+                for (itemSnapshot in snapshot.children) {
+                    val bloque = itemSnapshot.getValue(BloqueHorario::class.java)
+                    if (bloque != null && bloque.dia == dia) {
+                        bloque.id = itemSnapshot.key ?: ""
+                        if (bloque.cupos_disponibles > 0) {
+                            bloques.add(bloque)
+                        }
                     }
                 }
-                updateUI(bloques) // Actualiza la interfaz de usuario con los bloques filtrados
+                updateUI(bloques)
+
+                // Actualizar el TextView con la fecha correspondiente
+                actualizarTextViewFecha(dia)
             }.addOnFailureListener { exception ->
-                // Listener que se ejecuta si la consulta falla
-                Log.e("Firebase", "Error al obtener los datos", exception) // Registra el error
-                Toast.makeText(this, "Error al obtener los datos", Toast.LENGTH_SHORT).show() // Muestra un mensaje de error
+                Log.e("Firebase", "Error al obtener los datos", exception)
+                Toast.makeText(this, "Error al obtener los datos", Toast.LENGTH_SHORT).show()
             }
     }
+
 
     // Esta función recibe un número que representa el día de la semana (1=Lunes, 2=Martes, etc.)
     private fun calcularFechaSeleccionada(diaSeleccionado: Int): LocalDateTime {
@@ -319,45 +301,30 @@ class ReservasActivity : AppCompatActivity() {
     // Función que se ejecuta cuando se confirma una reserva
     private fun confirmarReserva() {
         if (selectedBloque == null) {
-            // Verifica si se ha seleccionado un bloque
             Toast.makeText(this, "Por favor, selecciona un horario primero", Toast.LENGTH_SHORT).show()
-            return // Salir si no hay bloque seleccionado
+            return
         }
 
-        // Obtener referencia directa al bloque seleccionado usando su ID
         val bloqueRef = database.child("bloqueHorarios").child(selectedBloque!!.id)
 
-        // Verificar cupos disponibles
-        bloqueRef.get().addOnSuccessListener { snapshot -> // Listener que se ejecuta si la consulta tiene éxito
-            val cuposActuales = snapshot.child("cupos_disponibles").getValue(Int::class.java) ?: 0 // Obtiene los cupos disponibles actuales
+        bloqueRef.get().addOnSuccessListener { snapshot ->
+            val cuposActuales = snapshot.child("cupos_disponibles").getValue(Int::class.java) ?: 0
 
-            if (cuposActuales > 0) { // Verifica si hay cupos disponibles
-                // Actualizar cupos disponibles
-                bloqueRef.child("cupos_disponibles").setValue(cuposActuales - 1) // Reduce el número de cupos disponibles
+            if (cuposActuales > 0) {
+                bloqueRef.child("cupos_disponibles").setValue(cuposActuales - 1)
                     .addOnSuccessListener {
-                        // Proceder con la creación de la reserva
-                        crearReserva() // Llama a la función para crear la reserva
+                        crearReserva()
+                        // Después de crear la reserva, actualizar la vista con el mismo día
+                        filterbloqueHorarios(currentDaySelected)
                     }
-                    .addOnFailureListener { e -> // Listener que se ejecuta si falla la actualización
-                        Toast.makeText(
-                            this,
-                            "Error al actualizar cupos: ${e.message}",
-                            Toast.LENGTH_SHORT
-                        ).show() // Muestra un mensaje de error
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error al actualizar cupos: ${e.message}", Toast.LENGTH_SHORT).show()
                     }
             } else {
-                Toast.makeText(
-                    this,
-                    "No hay cupos disponibles en este horario",
-                    Toast.LENGTH_SHORT
-                ).show() // Muestra un mensaje si no hay cupos disponibles
+                Toast.makeText(this, "No hay cupos disponibles en este horario", Toast.LENGTH_SHORT).show()
             }
-        }.addOnFailureListener { e -> // Listener que se ejecuta si falla la consulta
-            Toast.makeText(
-                this,
-                "Error al verificar cupos disponibles: ${e.message}",
-                Toast.LENGTH_SHORT
-            ).show() // Muestra un mensaje de error
+        }.addOnFailureListener { e ->
+            Toast.makeText(this, "Error al verificar cupos disponibles: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 

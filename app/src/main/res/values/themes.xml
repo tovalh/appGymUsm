@@ -3,8 +3,8 @@
 
     <style name="Theme.GymApp" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here -->
-        <item name="colorPrimary">#2196F3</item>
-        <item name="colorPrimaryDark">#1976D2</item>
+        <item name="colorPrimary">#065F97</item>
+        <item name="colorPrimaryDark">#065F97</item>
         <item name="colorAccent">#FFA000</item>
     </style>
 </resources>
