@@ -27,15 +27,19 @@ class HomeActivity : AppCompatActivity() {
         FirebaseApp.initializeApp(this)
         initializeDatabase()
         setupButtons()
-        mostrarFraseAleatoria()
         botonMenu()
         actualizarProximaReserva()
     }
+    override fun onResume() {
+        super.onResume()
+        mostrarFraseAleatoria()
+    }
+
     private fun initializeDatabase() {
         database = FirebaseDatabase.getInstance().reference
     }
 
-    private fun setupButtons(){
+    private fun setupButtons() {
         val reservaHorarioBoton = findViewById<Button>(R.id.btnReserva)
         reservaHorarioBoton.setOnClickListener {
             irReservas()
@@ -50,16 +54,19 @@ class HomeActivity : AppCompatActivity() {
                 R.id.nav_home -> {
                     true
                 }
+
                 R.id.nav_calendar -> {
                     val intentCalendario = Intent(this, ReservasActivity::class.java)
                     startActivity(intentCalendario)
                     true
                 }
+
                 R.id.nav_clock -> {
                     val intentReloj = Intent(this, HorarioActivity::class.java)
                     startActivity(intentReloj)
                     true
                 }
+
                 else -> false
             }
         }
@@ -73,25 +80,26 @@ class HomeActivity : AppCompatActivity() {
     private fun mostrarFraseAleatoria() {
         val tvFrase = findViewById<TextView>(R.id.tvQuote)
 
-        database.child("frasesMotivacionales").get().addOnSuccessListener { snapshot ->
-            // Convertir las frases a una lista
+        database.child("frases_motivacionales").get().addOnSuccessListener { snapshot ->
             val listaFrases = mutableListOf<String>()
+
             snapshot.children.forEach { fraseSnapshot ->
                 fraseSnapshot.getValue(String::class.java)?.let { frase ->
                     listaFrases.add(frase)
                 }
             }
 
-            // Seleccionar una frase aleatoria
             if (listaFrases.isNotEmpty()) {
                 val fraseAleatoria = listaFrases.random()
                 tvFrase.text = "\"$fraseAleatoria\""
+            } else {
+                tvFrase.text = "\"No hay frases disponibles.\""
             }
-        }.addOnFailureListener { error ->
-            Log.e("Firebase", "Error al obtener frases", error)
-            tvFrase.text = "\"El esfuerzo de hoy es el éxito de mañana.\""  // Frase por defecto
+        }.addOnFailureListener {
+            tvFrase.text = "\"El esfuerzo de hoy es el éxito de mañana.\""
         }
     }
+
 
     private fun actualizarProximaReserva() {
         // Referencia a los TextViews
@@ -100,39 +108,54 @@ class HomeActivity : AppCompatActivity() {
 
         // Formato de fecha "día de mes" en español
         val formatoFecha = DateTimeFormatter.ofPattern("d 'de' MMMM", Locale("es", "ES"))
-        val formatoFechaHoy = DateTimeFormatter.ofPattern("yyyy-MM-dd") // Para comparar con Firebase
-        val fechaHoy = fechaActual.format(formatoFechaHoy)
+        val formatoFechaHoy = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val fechaHoy = LocalDateTime.now().format(formatoFechaHoy)
         val userId = "usuario1"
 
         database.child("reservas").child(userId)
             .orderByChild("fecha")
             .startAt(fechaHoy)
-            .limitToFirst(1)
             .get()
             .addOnSuccessListener { snapshot ->
-                if (snapshot.exists()) {
-                    // Obtener la primera reserva
-                    val reservaSnapshot = snapshot.children.first()
+                var proximaReservaEncontrada = false
+                // Iterar sobre todas las reservas futuras hasta encontrar una activa
+                for (reservaSnapshot in snapshot.children) {
                     val reserva = reservaSnapshot.getValue(Reserva::class.java)
+                    // Verificar si la reserva está activa
+                    if (reserva?.estado == "Activo") {
+                        proximaReservaEncontrada = true
 
-                    reserva?.let {
-                        tvBloque.text = "Bloque ${it.hora_inicio} - ${it.hora_final}"
+                        // Formatear y mostrar la información de la reserva
+                        tvBloque.text = "Bloque ${reserva.hora_inicio} - ${reserva.hora_final}"
 
                         // Parsear la fecha de la reserva al formato deseado
-                        val fechaReserva = LocalDate.parse(it.fecha, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                        val fechaReserva = LocalDate.parse(
+                            reserva.fecha,
+                            DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                        )
                         val fechaFormateada = fechaReserva.format(formatoFecha)
 
-                        tvDiaLunes.text = "${it.dia} $fechaFormateada"
+                        tvDiaLunes.text = "${reserva.dia} $fechaFormateada"
+                        break // Salir del ciclo una vez que encontramos la primera reserva activa
                     }
-                } else {
-                    tvBloque.text = "No hay reservas próximas"
-                    tvDiaLunes.text = ""
+                }
+
+                // Si no se encontró ninguna reserva activa
+                if (!proximaReservaEncontrada) {
+                    mostrarMensajeSinReserva()
                 }
             }
             .addOnFailureListener { error ->
                 Log.e("Firebase", "Error al obtener reserva próxima", error)
-                tvBloque.text = "Error al cargar reserva"
-                tvDiaLunes.text = ""
             }
+    }
+
+    // Función auxiliar para mostrar mensaje cuando no hay reservas
+    private fun mostrarMensajeSinReserva() {
+        val tvBloque = findViewById<TextView>(R.id.tvBloque)
+        val tvDiaLunes = findViewById<TextView>(R.id.tvDiaLunes)
+
+        tvBloque.text = "Reservar bloque"
+        tvDiaLunes.text = "Reservar Dia"
     }
 }

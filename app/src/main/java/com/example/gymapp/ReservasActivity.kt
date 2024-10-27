@@ -9,7 +9,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gymapp.model.BloqueHorario
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -19,7 +18,6 @@ import com.google.firebase.database.FirebaseDatabase
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-
 
 class ReservasActivity : AppCompatActivity() {
 
@@ -39,38 +37,40 @@ class ReservasActivity : AppCompatActivity() {
         // Inicializar con el día actual
         val fechaActual = LocalDateTime.now()
         val diaActual = fechaActual.dayOfWeek.value
-        val diasDeLaSemana = listOf("Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado")
-        currentDaySelected = diasDeLaSemana[diaActual - 1]
 
-        fetchMenuItems() // Carga inicial con el día actual
+        // Si es domingo (día 7), establecer el día actual como Lunes
+        currentDaySelected = if (diaActual == 7) {
+            "Lunes"
+        } else {
+            val diasDeLaSemana = listOf("Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado")
+            diasDeLaSemana[diaActual - 1]
+        }
+
+        fetchMenuItems()
         botonMenu()
         setupButtons()
-
+        initializeTextView()
         bloquearBotones()
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun initializeTextView(){
-
+    private fun initializeTextView() {
         val fechaActual = LocalDateTime.now()
         val diaActual = fechaActual.dayOfWeek.value
 
-        // Mapea los días de la semana a los nombres que tienes en la base de datos
-        val diasDeLaSemana = listOf("Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado")
-        // Obtén el nombre del día correspondiente
-        val diaSeleccionado = diasDeLaSemana[diaActual -1] // Resta 1 porque la lista comienza en 0
-        // Formato para la fecha completa (ej.  23 de octubre")
-        val formatoFecha = DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES"))
-        // Calcula la fecha seleccionada, aquí asumimos que `calcularFechaSeleccionada` devuelve un LocalDate
-        val fechaSeleccionada = calcularFechaSeleccionada(diaActual)
+        // Si es domingo, mostrar información del lunes
+        val diasDeLaSemana = listOf("Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo")
+        val diaSeleccionado = if (diaActual == 7) {
+            "Lunes"
+        } else {
+            diasDeLaSemana[diaActual - 1]
+        }
 
-    // Formatea la fecha seleccionada
+        val formatoFecha = DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES"))
+        val fechaSeleccionada = calcularFechaSeleccionada(if (diaActual == 7) 1 else diaActual)
         val fechaFormateada = fechaSeleccionada.format(formatoFecha)
 
-// Actualiza el TextView con la fecha formateada
         val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
         txtFechaSeleccionada.text = "Día $diaSeleccionado $fechaFormateada"
-
     }
 
     private fun botonMenu() {
@@ -99,14 +99,10 @@ class ReservasActivity : AppCompatActivity() {
         }
     }
 
-
-    // Inicializa la referencia a la base de datos de Firebase
     private fun initializeDatabase() {
         database = FirebaseDatabase.getInstance().reference
-
     }
 
-    // Recycler View vacio
     private fun initializeRecyclerView() {
         recyclerView = findViewById(R.id.recyclerViewTimeBlocks)
         recyclerView.layoutManager = GridLayoutManager(this, 2)
@@ -116,7 +112,6 @@ class ReservasActivity : AppCompatActivity() {
         recyclerView.adapter = adapter
     }
 
-    //Logica para bloque seleccionado
     private fun handleBloqueSelection(bloqueSeleccionado: BloqueHorario) {
         selectedBloque = bloqueSeleccionado
         Toast.makeText(
@@ -146,7 +141,6 @@ class ReservasActivity : AppCompatActivity() {
         txtFechaSeleccionada.text = "Día $dia $fechaFormateada"
     }
 
-    // Configura los listeners de clic para los botones de billetera, carrito y filtros
     private fun setupButtons() {
         findViewById<Button>(R.id.btnLunes).setOnClickListener {
             filterbloqueHorarios("Lunes")
@@ -177,7 +171,6 @@ class ReservasActivity : AppCompatActivity() {
         }
     }
 
-    // Obtienelos elementos del menú desde Firebase
     private fun fetchMenuItems() {
         database.child("bloqueHorarios").get()
             .addOnSuccessListener { snapshot ->
@@ -192,8 +185,6 @@ class ReservasActivity : AppCompatActivity() {
                     }
                 }
                 updateUI(bloques)
-
-                // Actualizar el TextView con la fecha correspondiente
                 actualizarTextViewFecha(currentDaySelected)
             }.addOnFailureListener { exception ->
                 Log.e("Firebase", "Error al obtener los datos", exception)
@@ -201,15 +192,12 @@ class ReservasActivity : AppCompatActivity() {
             }
     }
 
-
-    // Actualiza la interfaz de usuario con la lista de elementos del bloque
     private fun updateUI(bloqueHorarios: List<BloqueHorario>) {
-        adapter.updateBloques(bloqueHorarios) // Actualiza el adaptador con la nueva lista de bloques
+        adapter.updateBloques(bloqueHorarios)
     }
 
-    //  filterBloqueHorarios para incluir el ID
     private fun filterbloqueHorarios(dia: String) {
-        currentDaySelected = dia // Actualizar el día seleccionado
+        currentDaySelected = dia
 
         database.child("bloqueHorarios").get()
             .addOnSuccessListener { snapshot ->
@@ -224,8 +212,6 @@ class ReservasActivity : AppCompatActivity() {
                     }
                 }
                 updateUI(bloques)
-
-                // Actualizar el TextView con la fecha correspondiente
                 actualizarTextViewFecha(dia)
             }.addOnFailureListener { exception ->
                 Log.e("Firebase", "Error al obtener los datos", exception)
@@ -233,72 +219,65 @@ class ReservasActivity : AppCompatActivity() {
             }
     }
 
-
-    // Esta función recibe un número que representa el día de la semana (1=Lunes, 2=Martes, etc.)
     private fun calcularFechaSeleccionada(diaSeleccionado: Int): LocalDateTime {
-        // Obtiene la fecha y hora actual del sistema
         val fechaActual = LocalDateTime.now()
-
-        // Obtiene el número del día de la semana actual (1-7)
         val diaActual = fechaActual.dayOfWeek.value
 
-        // Calcula cuántos días hay de diferencia entre el día seleccionado y el día actual
-        var diferencia = diaSeleccionado - diaActual
+        // Si es domingo, calculamos para la próxima semana
+        var diferencia = if (diaActual == 7) {
+            diaSeleccionado + (7 - diaActual)
+        } else {
+            diaSeleccionado - diaActual
+        }
 
         // Si la diferencia es negativa (seleccionamos un día anterior al actual)
         if (diferencia < 0) {
             diferencia += 7 // Suma 7 días para ir a la próxima semana
         }
 
-        // Añade los días de diferencia a la fecha actual y retorna la nueva fecha
         return fechaActual.plusDays(diferencia.toLong())
     }
 
-    //Funcion para bloquear botones antes de Hoy
-    private fun bloquearBotones(){
-
+    private fun bloquearBotones() {
         val fechaActual = LocalDateTime.now()
         val diaActual = fechaActual.dayOfWeek.value
 
-        // referencias a los botones
         val btnLunes = findViewById<Button>(R.id.btnLunes)
         val btnMartes = findViewById<Button>(R.id.btnMartes)
         val btnMiercoles = findViewById<Button>(R.id.btnMiercoles)
         val btnJueves = findViewById<Button>(R.id.btnJueves)
         val btnViernes = findViewById<Button>(R.id.btnViernes)
 
-        // Deshabilitar los botones según el día actual
-        when (diaActual) {
-            2 -> btnLunes.isEnabled = false
-            3 -> {
-                btnLunes.isEnabled = false
-                btnMartes.isEnabled = false
-            }
-            4 -> {
-                btnLunes.isEnabled = false
-                btnMartes.isEnabled = false
-                btnMiercoles.isEnabled = false
-            }
-            5 -> {
-                btnLunes.isEnabled = false
-                btnMartes.isEnabled = false
-                btnMiercoles.isEnabled = false
-                btnJueves.isEnabled = false
-            }
-            6 -> {
-                btnLunes.isEnabled = false
-                btnMartes.isEnabled = false
-                btnMiercoles.isEnabled = false
-                btnJueves.isEnabled = false
-                btnViernes.isEnabled = false
+        // Si es domingo, no deshabilitar ningún botón ya que mostraremos la próxima semana
+        if (diaActual != 7) {
+            when (diaActual) {
+                2 -> btnLunes.isEnabled = false
+                3 -> {
+                    btnLunes.isEnabled = false
+                    btnMartes.isEnabled = false
+                }
+                4 -> {
+                    btnLunes.isEnabled = false
+                    btnMartes.isEnabled = false
+                    btnMiercoles.isEnabled = false
+                }
+                5 -> {
+                    btnLunes.isEnabled = false
+                    btnMartes.isEnabled = false
+                    btnMiercoles.isEnabled = false
+                    btnJueves.isEnabled = false
+                }
+                6 -> {
+                    btnLunes.isEnabled = false
+                    btnMartes.isEnabled = false
+                    btnMiercoles.isEnabled = false
+                    btnJueves.isEnabled = false
+                    btnViernes.isEnabled = false
+                }
             }
         }
-
-
     }
 
-
-    // Función que se ejecuta cuando se confirma una reserva
     private fun confirmarReserva() {
         if (selectedBloque == null) {
             Toast.makeText(this, "Por favor, selecciona un horario primero", Toast.LENGTH_SHORT).show()
@@ -314,7 +293,6 @@ class ReservasActivity : AppCompatActivity() {
                 bloqueRef.child("cupos_disponibles").setValue(cuposActuales - 1)
                     .addOnSuccessListener {
                         crearReserva()
-                        // Después de crear la reserva, actualizar la vista con el mismo día
                         filterbloqueHorarios(currentDaySelected)
                     }
                     .addOnFailureListener { e ->
@@ -328,7 +306,6 @@ class ReservasActivity : AppCompatActivity() {
         }
     }
 
-    // Nueva función auxiliar para crear la reserva
     private fun crearReserva() {
         val fechaSeleccionada = calcularFechaSeleccionada(
             when (selectedBloque?.dia) {
@@ -338,24 +315,23 @@ class ReservasActivity : AppCompatActivity() {
                 "Jueves" -> 4
                 "Viernes" -> 5
                 "Sabado" -> 6
-                else -> 1 // Si el día no coincide, por defecto se asigna Lunes
+                else -> 1
             }
         )
 
-        val formatoFecha = DateTimeFormatter.ofPattern("yyyy-MM-dd") // Formato de fecha para la base de datos
-        val formatoFechaMensaje = DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES")) // Formato de fecha para mostrar al usuario
+        val formatoFecha = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val formatoFechaMensaje = DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES"))
 
-        val fechaFormateada = fechaSeleccionada.format(formatoFecha) // Formatea la fecha para la base de datos
-        val fechaFormateadaMensaje = fechaSeleccionada.format(formatoFechaMensaje) // Formatea la fecha para el mensaje al usuario
+        val fechaFormateada = fechaSeleccionada.format(formatoFecha)
+        val fechaFormateadaMensaje = fechaSeleccionada.format(formatoFechaMensaje)
 
-        // Obtiene las reservas existentes del usuario
         database.child("reservas")
             .child("usuario1")
             .get()
-            .addOnSuccessListener { snapshot -> // Listener que se ejecuta si la consulta tiene éxito
-                val sumaReserva = snapshot.childrenCount + 1 // Cuenta el número de reservas existentes y suma 1 para la nueva
+            .addOnSuccessListener { snapshot ->
+                val sumaReserva = snapshot.childrenCount + 1
                 val estadoReservadefault = "Activo"
-                // Crea un mapa con los detalles de la reserva
+
                 val reservaMap = hashMapOf(
                     "dia" to selectedBloque?.dia,
                     "fecha" to fechaFormateada,
@@ -364,28 +340,24 @@ class ReservasActivity : AppCompatActivity() {
                     "estado" to estadoReservadefault
                 )
 
-                // Añade la nueva reserva a la base de datos
                 database.child("reservas")
                     .child("usuario1")
                     .child("reserva$sumaReserva")
                     .setValue(reservaMap)
                     .addOnSuccessListener {
-                        // Muestra un mensaje de confirmación
                         Toast.makeText(
                             this,
                             "Reserva confirmada para: $fechaFormateadaMensaje",
                             Toast.LENGTH_SHORT
                         ).show()
-
-                        // Actualizar la UI para reflejar los cambios
-                        fetchMenuItems() // Vuelve a cargar los bloques de horario
+                        fetchMenuItems()
                     }
-                    .addOnFailureListener { e -> // Listener que se ejecuta si falla la creación de la reserva
+                    .addOnFailureListener { e ->
                         Toast.makeText(
                             this,
                             "Error al confirmar la reserva: ${e.message}",
                             Toast.LENGTH_SHORT
-                        ).show() // Muestra un mensaje de error
+                        ).show()
                     }
             }
     }
