@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white">
+    <ImageButton
+        android:id="@+id/btnAsistir"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ticket"
+        android:background="?android:selectableItemBackgroundBorderless"
+        android:scaleType="fitCenter"
+        android:contentDescription="Cerrar" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal">
+
+            <Button
+                android:id="@+id/btnLunes"
+                android:layout_width="55dp"
+                android:layout_height="58dp"
+                android:layout_margin="6dp"
+                android:background="@drawable/botonredondoazul"
+                android:backgroundTint="#065F97"
+                android:fontFamily="@font/roboto_mono_medium"
+                android:text="L"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnMartes"
+                android:layout_width="55dp"
+                android:layout_height="58dp"
+                android:layout_margin="6dp"
+                android:background="@drawable/botonredondoazul"
+                android:text="M"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnMiercoles"
+                android:layout_width="55dp"
+                android:layout_height="58dp"
+                android:layout_margin="6dp"
+                android:background="@drawable/botonredondoazul"
+                android:text="M"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnJueves"
+                android:layout_width="55dp"
+                android:layout_height="58dp"
+                android:layout_margin="6dp"
+                android:background="@drawable/botonredondoazul"
+                android:text="J"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnViernes"
+                android:layout_width="55dp"
+                android:layout_height="58dp"
+                android:layout_margin="6dp"
+                android:background="@drawable/botonredondoazul"
+                android:text="V"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnSabado"
+                android:layout_width="55dp"
+                android:layout_height="58dp"
+                android:layout_margin="6dp"
+                android:background="@drawable/botonredondoazul"
+                android:text="S"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+
+    </HorizontalScrollView>
+
+    <TextView
+        android:id="@+id/txtDiaSemana"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="10dp"
+        android:fontFamily="@font/roboto_mono_medium"
+        android:text=""
+        android:textColor="@android:color/black"
+        android:textSize="16sp" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewDays"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#065F97"
+        app:itemIconTint="@android:color/white"
+        app:itemTextColor="@android:color/white"
+        app:labelVisibilityMode="unlabeled"
+        app:menu="@menu/navbar"
+        app:itemIconSize="40dp" />
+
+</LinearLayout>
