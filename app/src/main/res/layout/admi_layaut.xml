@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="8dp"
+    app:cardCornerRadius="25dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp"
+    android:background="@android:color/transparent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:background="@drawable/fondohorariosemanal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/dia"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#065F97"
+                android:fontFamily="@font/roboto_mono_medium"
+                android:layout_marginBottom="4dp"
+                android:gravity="center"
+                android:textAlignment="center"/>
+
+            <TextView
+                android:id="@+id/horario"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="#065F97"
+                android:fontFamily="@font/roboto_mono_medium"
+                android:gravity="center"
+                android:textAlignment="center"/>
+
+            <TextView
+                android:id="@+id/fecha"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="14sp"
+                android:layout_marginTop="2dp"
+                android:textColor="@android:color/darker_gray"
+                android:gravity="center"
+                android:textAlignment="center"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnAsistir"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ticket"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"
+            android:contentDescription="Cerrar" />
+
+        <ImageButton
+            android:id="@+id/btnCancelar"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/close"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"
+            android:contentDescription="Cerrar" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
+
