@@ -10,9 +10,9 @@
         android:layout_width="28dp"
         android:layout_height="28dp"
         android:layout_marginLeft="5dp"
-        android:layout_marginRight="5dp"
-        android:layout_gravity="center_vertical"
-        android:src="@drawable/ticket"
+        android:layout_marginRight="10dp"
+        android:layout_gravity="right"
+        android:src="@drawable/ajuste"
         android:background="?android:selectableItemBackgroundBorderless"
         android:scaleType="fitCenter"
         android:contentDescription="Cerrar" />
@@ -99,6 +99,14 @@
 
 
     </HorizontalScrollView>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#76737B"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        />
 
     <TextView
         android:id="@+id/txtDiaSemana"

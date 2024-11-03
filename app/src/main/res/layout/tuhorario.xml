@@ -20,6 +20,14 @@
         android:paddingTop="15dp"
         android:paddingBottom="15dp" />
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#76737B"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewDays"
         android:layout_width="match_parent"
