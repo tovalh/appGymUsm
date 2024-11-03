@@ -121,7 +121,7 @@ class ReservasActivity : AppCompatActivity() {
         ).show()
     }
 
-    @SuppressLint("SetTextI18n")
+
     private fun actualizarTextViewFecha(dia: String) {
         val diaNumerico = when (dia) {
             "Lunes" -> 1

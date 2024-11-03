@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace = "com.example.gymapp"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.gymapp"
@@ -51,17 +51,16 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    buildToolsVersion = "35.0.0"
 }
 
 dependencies {
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
-    implementation(libs.androidx.room.runtime)
+
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth.ktx)
-    kapt(libs.androidx.room.compiler)
-    implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
