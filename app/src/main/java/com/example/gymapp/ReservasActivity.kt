@@ -15,6 +15,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -278,32 +279,74 @@ class ReservasActivity : AppCompatActivity() {
         }
     }
 
+    private fun penalizacionActiva(): Boolean {
+        var tienePenalizacion = false
+
+        database.child("penalizaciones_activas")
+            .child("usuario1")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    val fechaActual = LocalDate.now().toString()
+                    val fechaFin = snapshot.child("fecha_fin").getValue(String::class.java)
+                    if (fechaFin != null) {
+                        Log.d("fechaFin",fechaFin)
+                    }
+                    Log.d("fechaActual",fechaActual)
+                    if (fechaFin != null && fechaActual <= fechaFin) {
+                        tienePenalizacion = true
+                    }
+                }
+            }
+
+        return tienePenalizacion
+    }
+
     private fun confirmarReserva() {
         if (selectedBloque == null) {
             Toast.makeText(this, "Por favor, selecciona un horario primero", Toast.LENGTH_SHORT).show()
             return
         }
 
-        val bloqueRef = database.child("bloqueHorarios").child(selectedBloque!!.id)
+        database.child("penalizaciones_activas")
+            .child("usuario1")
+            .get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot.exists()) {
+                    val fechaActual = LocalDate.now().toString()
+                    val fechaFin = snapshot.child("fecha_fin").getValue(String::class.java)
 
-        bloqueRef.get().addOnSuccessListener { snapshot ->
-            val cuposActuales = snapshot.child("cupos_disponibles").getValue(Int::class.java) ?: 0
+                    if (fechaFin != null && fechaActual <= fechaFin) {
+                        Toast.makeText(this, "No puedes realizar reservas mientras tengas una penalización activa", Toast.LENGTH_SHORT).show()
+                        return@addOnSuccessListener
+                    }
+                }
 
-            if (cuposActuales > 0) {
-                bloqueRef.child("cupos_disponibles").setValue(cuposActuales - 1)
-                    .addOnSuccessListener {
-                        crearReserva()
-                        filterbloqueHorarios(currentDaySelected)
+                // Si no hay penalización, continúa con la reserva
+                val bloqueRef = database.child("bloqueHorarios").child(selectedBloque!!.id)
+
+                bloqueRef.get().addOnSuccessListener { bloqueSnapshot ->
+                    val cuposActuales = bloqueSnapshot.child("cupos_disponibles").getValue(Int::class.java) ?: 0
+
+                    if (cuposActuales > 0) {
+                        bloqueRef.child("cupos_disponibles").setValue(cuposActuales - 1)
+                            .addOnSuccessListener {
+                                crearReserva()
+                                filterbloqueHorarios(currentDaySelected)
+                            }
+                            .addOnFailureListener { e ->
+                                Toast.makeText(this, "Error al actualizar cupos: ${e.message}", Toast.LENGTH_SHORT).show()
+                            }
+                    } else {
+                        Toast.makeText(this, "No hay cupos disponibles en este horario", Toast.LENGTH_SHORT).show()
                     }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(this, "Error al actualizar cupos: ${e.message}", Toast.LENGTH_SHORT).show()
-                    }
-            } else {
-                Toast.makeText(this, "No hay cupos disponibles en este horario", Toast.LENGTH_SHORT).show()
+                }.addOnFailureListener { e ->
+                    Toast.makeText(this, "Error al verificar cupos disponibles: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
             }
-        }.addOnFailureListener { e ->
-            Toast.makeText(this, "Error al verificar cupos disponibles: ${e.message}", Toast.LENGTH_SHORT).show()
-        }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al verificar penalizaciones: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun crearReserva() {

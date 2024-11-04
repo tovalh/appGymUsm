@@ -15,6 +15,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class HorarioActivity: AppCompatActivity(){
 
@@ -67,6 +70,11 @@ class HorarioActivity: AppCompatActivity(){
         recyclerView.adapter = adapter // Establece el adaptador para el RecyclerView
     }
     private fun cancelarReserva(reserva: Reserva) {
+        // Validacion de Horas config con hora actual
+        if (!puedesCancelarReserva(reserva)) {
+            Toast.makeText(this, "No se puede cancelar con menos de 2 horas de anticipación", Toast.LENGTH_SHORT).show()
+            return
+        }
         // Usamos la estructura correcta del JSON para actualizar
         database.child("reservas")
             .child("usuario1")
@@ -76,13 +84,33 @@ class HorarioActivity: AppCompatActivity(){
             .addOnSuccessListener {
                 Toast.makeText(this, "Reserva cancelada exitosamente", Toast.LENGTH_SHORT).show()
                 fetchMenuItems() // Recargar la lista de reservas
+                restaurarCupo(reserva)
+                fetchMenuItems()
             }
             .addOnFailureListener {
                 Toast.makeText(this, "Error al cancelar la reserva", Toast.LENGTH_SHORT).show()
                 Log.e("Firebase", "Error al cancelar la reserva", it)
             }
-        restaurarCupo(reserva)
-        fetchMenuItems()
+
+    }
+
+    private fun puedesCancelarReserva(reserva: Reserva): Boolean {
+        try {
+            val fechaHoraReserva = "${reserva.fecha} ${reserva.hora_inicio}"
+            val formatter = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
+            val fechaReserva = formatter.parse(fechaHoraReserva)
+            val ahora = Calendar.getInstance().time
+
+            // Calcular diferencia en horas
+            val diferencia = fechaReserva.time - ahora.time
+            val diferenciaHoras = diferencia / (1000 * 60 * 60.0)
+
+            return diferenciaHoras > 2
+
+        } catch (e: Exception) {
+            Log.e("Firebase", "Error al validar tiempo de cancelación", e)
+            return false
+        }
     }
 
     private fun restaurarCupo(reserva: Reserva) {

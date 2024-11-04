@@ -19,7 +19,6 @@ import java.util.Locale
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var database: DatabaseReference
-    val fechaActual = LocalDateTime.now()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
