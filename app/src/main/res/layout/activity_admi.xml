@@ -119,6 +119,20 @@
         android:textColor="@android:color/black"
         android:textSize="16sp" />
 
+    <Spinner
+        android:id="@+id/spinnerBloques"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/spiner_style"
+        android:paddingStart="16dp"
+        android:paddingEnd="32dp"
+        android:spinnerMode="dropdown" />
+
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewDays"
         android:layout_width="match_parent"
