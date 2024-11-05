@@ -27,7 +27,7 @@ class AdminActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.reserva_horario)
+        setContentView(R.layout.activity_admi)
         FirebaseApp.initializeApp(this)
         initializeDatabase()
 
