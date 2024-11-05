@@ -7,6 +7,7 @@
     android:background="#FFFFFF">
 
     <Button
+        android:id="@+id/botonAdmi"
         android:layout_width="40dp"
         android:layout_height="50dp"
         android:layout_marginStart="171dp"

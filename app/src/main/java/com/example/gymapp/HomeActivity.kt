@@ -29,6 +29,7 @@ class HomeActivity : AppCompatActivity() {
         botonMenu()
         actualizarProximaReserva()
     }
+
     override fun onResume() {
         super.onResume()
         mostrarFraseAleatoria()
@@ -43,6 +44,18 @@ class HomeActivity : AppCompatActivity() {
         reservaHorarioBoton.setOnClickListener {
             irReservas()
         }
+
+        // Agregamos el botón de administrador
+        val botonAdmi = findViewById<Button>(R.id.botonAdmi)
+        botonAdmi.setOnClickListener {
+            irPaginaAdmi()
+        }
+    }
+
+    // Nueva función para navegar a la página de administrador
+    private fun irPaginaAdmi() {
+        val intent = Intent(this, AdminActivity::class.java)
+        startActivity(intent)
     }
 
     private fun botonMenu() {
@@ -99,13 +112,10 @@ class HomeActivity : AppCompatActivity() {
         }
     }
 
-
     private fun actualizarProximaReserva() {
-        // Referencia a los TextViews
         val tvBloque = findViewById<TextView>(R.id.tvBloque)
         val tvDiaLunes = findViewById<TextView>(R.id.tvDiaLunes)
 
-        // Formato de fecha "día de mes" en español
         val formatoFecha = DateTimeFormatter.ofPattern("d 'de' MMMM", Locale("es", "ES"))
         val formatoFechaHoy = DateTimeFormatter.ofPattern("yyyy-MM-dd")
         val fechaHoy = LocalDateTime.now().format(formatoFechaHoy)
@@ -117,17 +127,13 @@ class HomeActivity : AppCompatActivity() {
             .get()
             .addOnSuccessListener { snapshot ->
                 var proximaReservaEncontrada = false
-                // Iterar sobre todas las reservas futuras hasta encontrar una activa
                 for (reservaSnapshot in snapshot.children) {
                     val reserva = reservaSnapshot.getValue(Reserva::class.java)
-                    // Verificar si la reserva está activa
                     if (reserva?.estado == "Activo") {
                         proximaReservaEncontrada = true
 
-                        // Formatear y mostrar la información de la reserva
                         tvBloque.text = "Bloque ${reserva.hora_inicio} - ${reserva.hora_final}"
 
-                        // Parsear la fecha de la reserva al formato deseado
                         val fechaReserva = LocalDate.parse(
                             reserva.fecha,
                             DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -135,11 +141,10 @@ class HomeActivity : AppCompatActivity() {
                         val fechaFormateada = fechaReserva.format(formatoFecha)
 
                         tvDiaLunes.text = "${reserva.dia} $fechaFormateada"
-                        break // Salir del ciclo una vez que encontramos la primera reserva activa
+                        break
                     }
                 }
 
-                // Si no se encontró ninguna reserva activa
                 if (!proximaReservaEncontrada) {
                     mostrarMensajeSinReserva()
                 }
@@ -149,7 +154,6 @@ class HomeActivity : AppCompatActivity() {
             }
     }
 
-    // Función auxiliar para mostrar mensaje cuando no hay reservas
     private fun mostrarMensajeSinReserva() {
         val tvBloque = findViewById<TextView>(R.id.tvBloque)
         val tvDiaLunes = findViewById<TextView>(R.id.tvDiaLunes)
