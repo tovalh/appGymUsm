@@ -22,7 +22,7 @@ class AdminActivity : AppCompatActivity() {
 
     private lateinit var database: DatabaseReference
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: MyAdapter
+//    private lateinit var adapter: MyAdapter
     private var currentDaySelected: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,7 +73,7 @@ class AdminActivity : AppCompatActivity() {
                         }
                     }
                 }
-                updateUI(bloques)
+//                updateUI(bloques)
                 actualizarTextViewFecha(currentDaySelected)
             }.addOnFailureListener { exception ->
                 Log.e("Firebase", "Error al obtener los datos", exception)
@@ -81,9 +81,9 @@ class AdminActivity : AppCompatActivity() {
             }
     }
 
-    private fun updateUI(bloqueHorarios: List<BloqueHorario>) {
-        adapter.updateBloques(bloqueHorarios)
-    }
+//    private fun updateUI(bloqueHorarios: List<BloqueHorario>) {
+//        adapter.updateBloques(bloqueHorarios)
+//    }
 
     private fun botonMenu() {
         val menuNavegacion = findViewById<BottomNavigationView>(R.id.bottomNavigation)
@@ -210,7 +210,7 @@ class AdminActivity : AppCompatActivity() {
                         }
                     }
                 }
-                updateUI(bloques)
+//                updateUI(bloques)
                 actualizarTextViewFecha(dia)
             }.addOnFailureListener { exception ->
                 Log.e("Firebase", "Error al obtener los datos", exception)
