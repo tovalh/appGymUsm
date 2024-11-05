@@ -7,7 +7,7 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.startActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gymapp.model.BloqueHorario
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -25,13 +25,17 @@ class AdminActivity : AppCompatActivity() {
     private lateinit var adapter: MyAdapter
     private var currentDaySelected: String = ""
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.reserva_horario)
         FirebaseApp.initializeApp(this)
         initializeDatabase()
+
+        // Inicializar RecyclerView y Adapter
+        //recyclerView = findViewById(R.id.recyclerAdmi)
+       // recyclerView.layoutManager = LinearLayoutManager(this)
+        //adapter = MyAdapter(mutableListOf())
+       // recyclerView.adapter = adapter
 
         // Inicializar con el día actual
         val fechaActual = LocalDateTime.now()
@@ -45,9 +49,9 @@ class AdminActivity : AppCompatActivity() {
             diasDeLaSemana[diaActual - 1]
         }
 
+        setupButtons() // Agregar esta línea para inicializar los botones
         fetchMenuItems()
         botonMenu()
-
         initializeTextView()
         bloquearBotones()
     }

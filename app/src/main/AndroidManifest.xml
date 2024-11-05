@@ -32,6 +32,9 @@
             android:name=".HorarioActivity"
             android:exported="false" />
 
+        <activity android:name=".AdminActivity"
+            android:exported="false"/>
+
         <!-- Si no usas MainActivity, puedes eliminarla -->
     </application>
 
