@@ -279,29 +279,6 @@ class ReservasActivity : AppCompatActivity() {
         }
     }
 
-    private fun penalizacionActiva(): Boolean {
-        var tienePenalizacion = false
-
-        database.child("penalizaciones_activas")
-            .child("usuario1")
-            .get()
-            .addOnSuccessListener { snapshot ->
-                if (snapshot.exists()) {
-                    val fechaActual = LocalDate.now().toString()
-                    val fechaFin = snapshot.child("fecha_fin").getValue(String::class.java)
-                    if (fechaFin != null) {
-                        Log.d("fechaFin",fechaFin)
-                    }
-                    Log.d("fechaActual",fechaActual)
-                    if (fechaFin != null && fechaActual <= fechaFin) {
-                        tienePenalizacion = true
-                    }
-                }
-            }
-
-        return tienePenalizacion
-    }
-
     private fun confirmarReserva() {
         if (selectedBloque == null) {
             Toast.makeText(this, "Por favor, selecciona un horario primero", Toast.LENGTH_SHORT).show()
@@ -332,6 +309,7 @@ class ReservasActivity : AppCompatActivity() {
                         bloqueRef.child("cupos_disponibles").setValue(cuposActuales - 1)
                             .addOnSuccessListener {
                                 crearReserva()
+                                crearAsistencia()
                                 filterbloqueHorarios(currentDaySelected)
                             }
                             .addOnFailureListener { e ->
@@ -346,6 +324,48 @@ class ReservasActivity : AppCompatActivity() {
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error al verificar penalizaciones: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun crearAsistencia(){
+
+        val fechaSeleccionada = calcularFechaSeleccionada(
+            when (selectedBloque?.dia) {
+                "Lunes" -> 1
+                "Martes" -> 2
+                "Miercoles" -> 3
+                "Jueves" -> 4
+                "Viernes" -> 5
+                "Sabado" -> 6
+                else -> 1
+            }
+        )
+
+        val formatoFecha = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val fechaFormateada = fechaSeleccionada.format(formatoFecha)
+
+        // Crear el identificador del bloque horario
+        val horarioId = "${selectedBloque?.hora_inicio}-${selectedBloque?.hora_final}"
+
+        // Crear la estructura de asistencia
+        val asistenciaMap = hashMapOf(
+            "asistio" to false,  // Inicialmente false hasta que asista
+            "hora_marcacion" to ""  // Se llenará cuando marque asistencia
+        )
+
+        // Guardar en la base de datos
+        database.child("asistencias")
+            .child(fechaFormateada)
+            .child(horarioId)
+            .child("usuarios")
+            .child("usuario2")
+            .setValue(asistenciaMap)
+            .addOnFailureListener { e ->
+                Toast.makeText(
+                    this,
+                    "Error al registrar asistencia: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 
