@@ -11,7 +11,7 @@ open class UsuarioItem(
 
 // Clase para representar una reserva
 data class Usuario(
-    override val userId: String = "",
+    override var userId: String = "",
     override val nombre: String = "",
     override val email: String = "",
     override val asistio: Boolean = false,
