@@ -327,6 +327,8 @@ class AdminActivity : AppCompatActivity() {
         }
     }
 
+    // ABRIR MODAL
+
     private fun showAjustesDialog() {
         Dialog(this).apply {
             setContentView(R.layout.asistencia)
@@ -339,20 +341,113 @@ class AdminActivity : AppCompatActivity() {
                 )
                 setGravity(Gravity.CENTER)
                 setWindowAnimations(android.R.style.Animation_Dialog)
-                setDimAmount(0.5f)  // Oscurecer el fondo
+                setDimAmount(0.5f)
             }
 
-            // Si quieres manejar el click fuera del diálogo
-            setCanceledOnTouchOutside(true)
+            // Obtener referencias de las vistas
+            val etHorasMaximas = findViewById<EditText>(R.id.HorasMaximas)
+            val etInasistencias = findViewById<EditText>(R.id.Inasistencias)
+            val spinnerRestriccion = findViewById<Spinner>(R.id.spinnerRestriccion)
+            val btnGuardar = findViewById<Button>(R.id.btnGuardar)
 
-            // Para agregar un botón de cerrar dentro del diálogo:
+            // Configurar el spinner con valores del 1 al 31
+            val diasList = (1..31).map { it.toString() }
+            val spinnerAdapter = ArrayAdapter(this@AdminActivity, android.R.layout.simple_spinner_item, diasList)
+            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            spinnerRestriccion.adapter = spinnerAdapter
+
+            // Cargar valores de configuración
+            cargarConfiguracion { config ->
+                etHorasMaximas.setText(config.horasMaximas.toString())
+                etInasistencias.setText(config.inasistenciasMaximas.toString())
+                // Establecer el valor del spinner (restamos 1 porque los índices empiezan en 0)
+                spinnerRestriccion.setSelection(config.diasRestriccion - 1)
+            }
+
+            // Configurar el botón de guardar
+            btnGuardar.setOnClickListener {
+                val horasMaximas = etHorasMaximas.text.toString().toIntOrNull() ?: 2
+                val inasistenciasMaximas = etInasistencias.text.toString().toIntOrNull() ?: 3
+                val diasRestriccion = spinnerRestriccion.selectedItem.toString().toInt()
+
+                guardarConfiguracion(
+                    horasMaximas,
+                    inasistenciasMaximas,
+                    diasRestriccion
+                ) { exitoso ->
+                    if (exitoso) {
+                        Toast.makeText(context, "Configuración guardada exitosamente", Toast.LENGTH_SHORT).show()
+                        dismiss()
+                    } else {
+                        Toast.makeText(context, "Error al guardar la configuración", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
             findViewById<View>(R.id.btnCerrar)?.setOnClickListener {
                 dismiss()
             }
 
+            setCanceledOnTouchOutside(true)
             show()
         }
     }
+
+    // Modelo de Item -> Pasarlo a Modelo
+
+    private data class ConfiguracionSistema(
+        val horasMaximas: Int,
+        val inasistenciasMaximas: Int,
+        val diasRestriccion: Int
+    )
+
+
+    // Cargar Configuracion desde BBDD
+
+    private fun cargarConfiguracion(onComplete: (ConfiguracionSistema) -> Unit) {
+        database.child("configuracion_sistema")
+            .child("restricciones")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val horasMaximas = snapshot.child("horas_maximas_cancelacion").getValue(Int::class.java) ?: 2
+                    val inasistenciasMaximas = snapshot.child("inasistencias_maximas").getValue(Int::class.java) ?: 3
+                    val diasRestriccion = snapshot.child("dias_restriccion").getValue(Int::class.java) ?: 7
+
+                    onComplete(ConfiguracionSistema(horasMaximas, inasistenciasMaximas, diasRestriccion))
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("Firebase", "Error al cargar configuración", error.toException())
+                    onComplete(ConfiguracionSistema(2, 3, 7)) // Valores por defecto
+                }
+            })
+    }
+
+    //Boton Guardar
+
+    private fun guardarConfiguracion(
+        horasMaximas: Int,
+        inasistenciasMaximas: Int,
+        diasRestriccion: Int,
+        onComplete: (Boolean) -> Unit
+    ) {
+        val updates = hashMapOf<String, Any>(
+            "horas_maximas_cancelacion" to horasMaximas,
+            "inasistencias_maximas" to inasistenciasMaximas,
+            "dias_restriccion" to diasRestriccion
+        )
+
+        database.child("configuracion_sistema")
+            .child("restricciones")
+            .updateChildren(updates)
+            .addOnSuccessListener {
+                onComplete(true)
+            }
+            .addOnFailureListener {
+                onComplete(false)
+            }
+    }
+
 
 
     private fun botonMenu() {
