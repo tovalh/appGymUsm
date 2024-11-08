@@ -1,5 +1,6 @@
 package com.example.gymapp
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,7 +30,7 @@ class AdaptadorUsuario(
     override fun onBindViewHolder(holder: AsistenciaViewHolder, position: Int) {
         val usuario = usuarios[position]
         holder.nombreTextView.text = usuario.nombre
-
+        Log.d("Adapter", "Binding usuario: ${usuario.nombre}")
         holder.btnAsistir.setOnClickListener { onAsistenciaClick(usuario) }
         holder.btnCancelar.setOnClickListener { onCancelarClick(usuario) }
     }

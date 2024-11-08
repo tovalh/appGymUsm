@@ -115,12 +115,16 @@ class AdminActivity : AppCompatActivity() {
             .child("usuarios")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    usuarios.clear()
+                    val listaUsuarios = mutableListOf<Usuario>()
                     for (usuarioSnapshot in snapshot.children) {
-                        val usuario = usuarioSnapshot.getValue(Usuario::class.java)
-                        usuario?.let { usuarios.add(it) }
+                        val nombreUsuario = usuarioSnapshot.key ?: ""
+                        val asistio = usuarioSnapshot.child("asistio").getValue(Boolean::class.java) ?: false
+                        val horaMarcacion = usuarioSnapshot.child("hora_marcacion").getValue(String::class.java) ?: ""
+
+                        listaUsuarios.add(Usuario(nombreUsuario, asistio, horaMarcacion))
                     }
-                    adaptador.updateUsuarios(usuarios)
+                    actualizarRecyclerView(listaUsuarios)
+                    Log.d("Firebase", "Usuarios cargados: ${listaUsuarios.size}") // Para debug
                 }
 
                 override fun onCancelled(error: DatabaseError) {
@@ -145,6 +149,12 @@ class AdminActivity : AppCompatActivity() {
         recyclerView.adapter = adaptador
     }
 
+    private fun actualizarRecyclerView(nuevosUsuarios: List<Usuario>) {
+        usuarios.clear()
+        usuarios.addAll(nuevosUsuarios)
+        adaptador.notifyDataSetChanged()
+        Log.d("RecyclerView", "Actualizando con usuarios: ${nuevosUsuarios.map { it.nombre }}")
+    }
 
 
     private fun initializeDatabase() {
