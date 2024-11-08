@@ -358,7 +358,7 @@ class ReservasActivity : AppCompatActivity() {
             .child(fechaFormateada)
             .child(horarioId)
             .child("usuarios")
-            .child("usuario2")
+            .child("usuario1")
             .setValue(asistenciaMap)
             .addOnFailureListener { e ->
                 Toast.makeText(

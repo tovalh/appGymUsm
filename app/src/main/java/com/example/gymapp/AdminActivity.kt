@@ -7,8 +7,10 @@ import android.view.View
 
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 
 import androidx.recyclerview.widget.RecyclerView
+import com.example.gymapp.model.Usuario
 
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
@@ -18,9 +20,15 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+
 class AdminActivity : AppCompatActivity() {
     private lateinit var database: DatabaseReference
     private var currentDaySelected: String = ""
+    private lateinit var adaptador: AdaptadorUsuario
+    private var usuarios = mutableListOf<Usuario>()
     private lateinit var recyclerView: RecyclerView
     private var horarioSeleccionado: String = ""
 
@@ -42,6 +50,7 @@ class AdminActivity : AppCompatActivity() {
             diasDeLaSemana[diaActual - 1]
         }
 
+        initializeRecyclerView()
         crearSpinner()
         botonMenu()
         setupButtons()
@@ -85,8 +94,53 @@ class AdminActivity : AppCompatActivity() {
         }
     }
 
-    private fun cargarUsuarios(){
+    private fun cargarUsuarios() {
+        val fechaFormateada = calcularFechaSeleccionada(
+            when (currentDaySelected) {
+                "Lunes" -> 1
+                "Martes" -> 2
+                "Miercoles" -> 3
+                "Jueves" -> 4
+                "Viernes" -> 5
+                "Sabado" -> 6
+                else -> 1
+            }
+        ).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
+        database.child("asistencias")
+            .child(fechaFormateada)
+            .child(horarioSeleccionado)
+            .child("usuarios")
+            .addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    usuarios.clear()
+                    for (usuarioSnapshot in snapshot.children) {
+                        val usuario = usuarioSnapshot.getValue(Usuario::class.java)
+                        usuario?.let { usuarios.add(it) }
+                    }
+                    adaptador.updateUsuarios(usuarios)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("Firebase", "Error al cargar usuarios", error.toException())
+                }
+            })
+    }
+
+    // Agrega esta función para inicializar el RecyclerView en onCreate
+    private fun initializeRecyclerView() {
+        recyclerView = findViewById(R.id.recyclerAdmi)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        adaptador = AdaptadorUsuario(
+            usuarios,
+            onAsistenciaClick = { usuario ->
+                // Manejar click en asistencia
+            },
+            onCancelarClick = { usuario ->
+                // Manejar click en cancelar
+            }
+        )
+        recyclerView.adapter = adaptador
     }
 
 
