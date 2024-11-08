@@ -302,7 +302,7 @@ class ReservasActivity : AppCompatActivity() {
         }
 
         database.child("penalizaciones_activas")
-            .child("usuario1")
+            .child(userName!!)
             .get()
             .addOnSuccessListener { snapshot ->
                 if (snapshot.exists()) {

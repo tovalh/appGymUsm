@@ -22,6 +22,8 @@ import java.util.Locale
 class HorarioActivity: AppCompatActivity(){
 
     private lateinit var database: DatabaseReference
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: AdaptadorReserva
 
     // Datos usuario Activo
     private var userEmail: String? = null
@@ -33,14 +35,31 @@ class HorarioActivity: AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.tuhorario)
         FirebaseApp.initializeApp(this)
-        initializeDatabase() // Inicializa la referencia a la base de datos de Firebase
-        fetchMenuItems()
-        botonMenu()
 
         // Obtener los extras del Intent
         userEmail = intent.getStringExtra("userEmail")
         userName = intent.getStringExtra("userName")
         userIsAdmin = intent.getBooleanExtra("userIsAdmin", false)
+
+        // Inicializar RecyclerView y Adapter con lista vacía
+        recyclerView = findViewById(R.id.recyclerViewDays)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        adapter = AdaptadorReserva(emptyList()) { reserva ->
+            cancelarReserva(reserva)
+        }
+        recyclerView.adapter = adapter
+
+        initializeDatabase()
+
+        // Verificar si tenemos userName antes de fetch
+        if (userName.isNullOrEmpty()) {
+            Toast.makeText(this, "Error: No se pudo obtener el nombre de usuario", Toast.LENGTH_LONG).show()
+            Log.e("HorarioActivity", "userName is null or empty")
+            return
+        }
+
+        fetchMenuItems()
+        botonMenu()
     }
 
     // Inicializa la referencia a la base de datos de Firebase
@@ -50,23 +69,25 @@ class HorarioActivity: AppCompatActivity(){
 
     // Obtienelos elementos del menú desde Firebase
     private fun fetchMenuItems() {
-        database.child("reservas")
-            .child(userName.toString())
-            .get().addOnSuccessListener { snapshot -> // Obtiene datos del nodo
-            val reservasLista = mutableListOf<Reserva>() // Crea una lista para almacenar los elementos del menú
-            for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
-                val reserva = itemSnapshot.getValue(Reserva::class.java) // Convierte los datos a un objeto MenuItem
-                if (reserva != null && reserva.estado == "Activo") {
-                    reserva.id = itemSnapshot.key ?: ""
-                    reservasLista.add(reserva) // Agrega el elemento del menú a la lista
+        userName?.let {
+            database.child("reservas")
+                .child(it)
+                .get().addOnSuccessListener { snapshot -> // Obtiene datos del nodo
+                val reservasLista = mutableListOf<Reserva>() // Crea una lista para almacenar los elementos del menú
+                for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
+                    val reserva = itemSnapshot.getValue(Reserva::class.java) // Convierte los datos a un objeto MenuItem
+                    if (reserva != null && reserva.estado == "Activo") {
+                        reserva.id = itemSnapshot.key ?: ""
+                        reservasLista.add(reserva) // Agrega el elemento del menú a la lista
+                    }
                 }
+                    // Ordenar la lista por fecha antes de actualizar la UI
+                reservasLista.sortBy { it.fecha }
+                updateUI(reservasLista) // Actualiza la interfaz de usuario con los elementos del menú obtenidos
+            }.addOnFailureListener {
+                Log.e("Firebase", "Error al obtener los datos", it) // Registra el error si falla la obtención de datos
+                Toast.makeText(this, "Error al obtener los datos", Toast.LENGTH_SHORT).show() // Muestra un mensaje de error
             }
-                // Ordenar la lista por fecha antes de actualizar la UI
-            reservasLista.sortBy { it.fecha }
-            updateUI(reservasLista) // Actualiza la interfaz de usuario con los elementos del menú obtenidos
-        }.addOnFailureListener {
-            Log.e("Firebase", "Error al obtener los datos", it) // Registra el error si falla la obtención de datos
-            Toast.makeText(this, "Error al obtener los datos", Toast.LENGTH_SHORT).show() // Muestra un mensaje de error
         }
     }
 
@@ -86,21 +107,23 @@ class HorarioActivity: AppCompatActivity(){
             return
         }
         // Usamos la estructura correcta del JSON para actualizar
-        database.child("reservas")
-            .child("usuario1")
-            .child(reserva.id) // Aquí deberías tener una forma de identificar la reserva específica
-            .child("estado")
-            .setValue("Cancelada")
-            .addOnSuccessListener {
-                Toast.makeText(this, "Reserva cancelada exitosamente", Toast.LENGTH_SHORT).show()
-                fetchMenuItems() // Recargar la lista de reservas
-                restaurarCupo(reserva)
-                fetchMenuItems()
-            }
-            .addOnFailureListener {
-                Toast.makeText(this, "Error al cancelar la reserva", Toast.LENGTH_SHORT).show()
-                Log.e("Firebase", "Error al cancelar la reserva", it)
-            }
+        userName?.let {
+            database.child("reservas")
+                .child(it)
+                .child(reserva.id) // Aquí deberías tener una forma de identificar la reserva específica
+                .child("estado")
+                .setValue("Cancelada")
+                .addOnSuccessListener {
+                    Toast.makeText(this, "Reserva cancelada exitosamente", Toast.LENGTH_SHORT).show()
+                    fetchMenuItems() // Recargar la lista de reservas
+                    restaurarCupo(reserva)
+                    fetchMenuItems()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Error al cancelar la reserva", Toast.LENGTH_SHORT).show()
+                    Log.e("Firebase", "Error al cancelar la reserva", it)
+                }
+        }
 
     }
 
