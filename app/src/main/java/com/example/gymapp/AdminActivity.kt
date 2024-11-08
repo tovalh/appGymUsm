@@ -2,6 +2,7 @@ package com.example.gymapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -39,11 +40,37 @@ class AdminActivity : AppCompatActivity() {
             diasDeLaSemana[diaActual - 1]
         }
 
+        crearSpinner()
         botonMenu()
         setupButtons()
         initializeTextView()
         bloquearBotones()
     }
+
+    private fun crearSpinner(){
+            val horarios = arrayOf(
+                "8:20-9:30",
+                "9:35-10:45",
+                "10:50-12:00",
+                "12:05-13:15",
+                "13:20-14:30",
+                "14:35-15:45",
+                "15:50-17:00",
+                "17:05-18:15",
+                "18:20-19:30",
+                "19:35-20:45",
+                "20:50-22:00"
+            )
+
+            val spinner = findViewById<Spinner>(R.id.spinnerBloques) // Asegúrate de tener este ID en tu layout
+            val adapter = ArrayAdapter(
+                this,
+                R.layout.spiner_item,
+                R.id.spinnerText,
+                horarios
+            )
+            spinner.adapter = adapter
+        }
 
     private fun initializeDatabase() {
         database = FirebaseDatabase.getInstance().reference
@@ -97,7 +124,7 @@ class AdminActivity : AppCompatActivity() {
     }
 
 
-        private fun botonMenu() {
+    private fun botonMenu() {
         val menuNavegacion = findViewById<BottomNavigationView>(R.id.bottomNavigation)
 
         menuNavegacion.setOnItemSelectedListener { item ->
