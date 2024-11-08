@@ -74,14 +74,16 @@ class AdminActivity : AppCompatActivity() {
         )
 
         val spinner = findViewById<Spinner>(R.id.spinnerBloques)
+
+        // Configura el adaptador para que utilice dos layouts diferentes
         val adapter = ArrayAdapter(
             this,
-            R.layout.spinner_item,
-            R.id.spinnerText,
+            R.layout.spinner_item,       // Vista principal con el ícono
+            R.id.spinnerText,            // ID del TextView para ambos layouts
             horarios
         )
+        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item) // Vista desplegable sin el ícono
         spinner.adapter = adapter
-
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 horarioSeleccionado = horarios[position]

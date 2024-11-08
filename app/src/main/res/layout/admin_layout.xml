@@ -31,14 +31,14 @@
                 android:id="@+id/nombre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#065F97"
-                android:fontFamily="@font/roboto_mono_medium"
-                android:layout_marginBottom="4dp"
-                android:gravity="center"
-                android:textAlignment="center"/>
-
+                android:minHeight="48dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@color/Azul_usm"
+            android:fontFamily="@font/roboto_mono_medium"
+            android:layout_marginBottom="4dp"
+            android:gravity="center"
+            android:textAlignment="center" />
 
         </LinearLayout>
 
