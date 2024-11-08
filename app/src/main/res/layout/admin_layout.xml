@@ -44,10 +44,10 @@
 
         <ImageButton
             android:id="@+id/btnAsistir"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
+            android:layout_marginRight="15dp"
             android:layout_gravity="center_vertical"
             android:src="@drawable/ticket"
             android:background="?android:selectableItemBackgroundBorderless"
@@ -56,8 +56,10 @@
 
         <ImageButton
             android:id="@+id/btnCancelar"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
             android:layout_gravity="center_vertical"
             android:src="@drawable/close"
             android:background="?android:selectableItemBackgroundBorderless"
