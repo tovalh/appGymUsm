@@ -9,36 +9,35 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.gymapp.model.Usuario
 
 class AdaptadorUsuario(
-    private val usuarioLista: List<Usuario>,
-    private val onEditClick: (Usuario) -> Unit,
-    private val onDeleteClick: (Usuario) -> Unit
-) : RecyclerView.Adapter<AdaptadorUsuario.MyViewHolder>() {
+    private var usuarios: List<Usuario>,
+    private val onAsistenciaClick: (Usuario) -> Unit,
+    private val onCancelarClick: (Usuario) -> Unit
+) : RecyclerView.Adapter<AdaptadorUsuario.AsistenciaViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.admi_layaut, parent, false)
-        return MyViewHolder(view)
-    }
-
-    override fun getItemCount(): Int {
-        return usuarioLista.size
-    }
-
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val usuario = usuarioLista[position]
-        holder.nombre.text = usuario.nombre
-
-        holder.btnAsistir.setOnClickListener {
-            onEditClick(usuario)
-        }
-
-        holder.btnCancelar.setOnClickListener {
-            onDeleteClick(usuario)
-        }
-    }
-
-    class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val nombre: TextView = itemView.findViewById(R.id.nombre)
+    class AsistenciaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val nombreTextView: TextView = itemView.findViewById(R.id.nombre)
         val btnAsistir: ImageButton = itemView.findViewById(R.id.btnAsistir)
         val btnCancelar: ImageButton = itemView.findViewById(R.id.btnCancelar)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AsistenciaViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.admin_layout, parent, false)
+        return AsistenciaViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: AsistenciaViewHolder, position: Int) {
+        val usuario = usuarios[position]
+        holder.nombreTextView.text = usuario.nombre
+
+        holder.btnAsistir.setOnClickListener { onAsistenciaClick(usuario) }
+        holder.btnCancelar.setOnClickListener { onCancelarClick(usuario) }
+    }
+
+    override fun getItemCount() = usuarios.size
+
+    fun updateUsuarios(newUsuarios: List<Usuario>) {
+        usuarios = newUsuarios
+        notifyDataSetChanged()
     }
 }

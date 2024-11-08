@@ -13,7 +13,7 @@ class AdministradorAdapter(
 ) : RecyclerView.Adapter<AdministradorAdapter.MyViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.admi_layaut, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.admin_layout, parent, false)
         return MyViewHolder(view)
     }
 
