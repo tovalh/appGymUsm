@@ -82,18 +82,18 @@ class HomeActivity : AppCompatActivity() {
 
                 R.id.nav_calendar -> {
                     val intentCalendario = Intent(this, ReservasActivity::class.java)
-                    intent.putExtra("userEmail", userEmail)
-                    intent.putExtra("userName", userName)
-                    intent.putExtra("userIsAdmin", userIsAdmin)
+                    intentCalendario.putExtra("userEmail", userEmail)
+                    intentCalendario.putExtra("userName", userName)
+                    intentCalendario.putExtra("userIsAdmin", userIsAdmin)
                     startActivity(intentCalendario)
                     true
                 }
 
                 R.id.nav_clock -> {
                     val intentReloj = Intent(this, HorarioActivity::class.java)
-                    intent.putExtra("userEmail", userEmail)
-                    intent.putExtra("userName", userName)
-                    intent.putExtra("userIsAdmin", userIsAdmin)
+                    intentReloj.putExtra("userEmail", userEmail)
+                    intentReloj.putExtra("userName", userName)
+                    intentReloj.putExtra("userIsAdmin", userIsAdmin)
                     startActivity(intentReloj)
                     true
                 }
