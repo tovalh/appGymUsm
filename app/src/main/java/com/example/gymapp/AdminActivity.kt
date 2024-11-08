@@ -1,28 +1,30 @@
 package com.example.gymapp
 
+import android.app.Dialog
 import android.content.Intent
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
 import android.view.View
-
+import android.view.WindowManager
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.graphics.Color
 import androidx.recyclerview.widget.LinearLayoutManager
-
 import androidx.recyclerview.widget.RecyclerView
 import com.example.gymapp.model.Usuario
-
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.ValueEventListener
 
 class AdminActivity : AppCompatActivity() {
     private lateinit var database: DatabaseReference
@@ -183,8 +185,8 @@ class AdminActivity : AppCompatActivity() {
 
 
     private fun setupButtons() {
-        findViewById<Button>(R.id.btnLunes).setOnClickListener {
-            filterbloqueHorarios("Lunes")
+        findViewById<ImageButton>(R.id.btnAjustes).setOnClickListener {
+            showAjustesDialog()
         }
 
         findViewById<Button>(R.id.btnMartes).setOnClickListener {
@@ -205,6 +207,33 @@ class AdminActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.btnSabado).setOnClickListener {
             filterbloqueHorarios("Sabado")
+        }
+    }
+
+    private fun showAjustesDialog() {
+        Dialog(this).apply {
+            setContentView(R.layout.asistencia)
+
+            // Configurar la ventana del diálogo
+            window?.apply {
+                setLayout(
+                    WindowManager.LayoutParams.MATCH_PARENT,
+                    WindowManager.LayoutParams.WRAP_CONTENT
+                )
+                setGravity(Gravity.CENTER)
+                setWindowAnimations(android.R.style.Animation_Dialog)
+                setDimAmount(0.5f)  // Oscurecer el fondo
+            }
+
+            // Si quieres manejar el click fuera del diálogo
+            setCanceledOnTouchOutside(true)
+
+            // Para agregar un botón de cerrar dentro del diálogo:
+            findViewById<View>(R.id.btnCerrar)?.setOnClickListener {
+                dismiss()
+            }
+
+            show()
         }
     }
 
