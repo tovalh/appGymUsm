@@ -3,6 +3,7 @@ package com.example.gymapp
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
@@ -21,6 +22,7 @@ class AdminActivity : AppCompatActivity() {
     private lateinit var database: DatabaseReference
     private var currentDaySelected: String = ""
     private lateinit var recyclerView: RecyclerView
+    private var horarioSeleccionado: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,18 +64,31 @@ class AdminActivity : AppCompatActivity() {
             "20:50-22:00"
         )
 
-        val spinner = findViewById<Spinner>(R.id.spinnerBloques) // Asegúrate de tener este ID en tu layout
-
-        // Configura el adaptador para que utilice dos layouts diferentes
+        val spinner = findViewById<Spinner>(R.id.spinnerBloques)
         val adapter = ArrayAdapter(
             this,
-            R.layout.spinner_item,       // Vista principal con el ícono
+            R.layout.spinner_item,
             R.id.spinnerText,
             horarios
         )
-        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item) // Vista desplegable sin el ícono
         spinner.adapter = adapter
+
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                horarioSeleccionado = horarios[position]
+                cargarUsuarios() // Cargar usuarios cuando cambie el horario
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                horarioSeleccionado = ""
+            }
+        }
     }
+
+    private fun cargarUsuarios(){
+
+    }
+
 
 
     private fun initializeDatabase() {
