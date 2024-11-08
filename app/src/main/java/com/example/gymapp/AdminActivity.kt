@@ -2,14 +2,12 @@ package com.example.gymapp
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import android.view.View
+
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
+
 import androidx.recyclerview.widget.RecyclerView
-import com.example.gymapp.model.BloqueHorario
-import com.example.gymapp.model.Usuario
+
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseReference
@@ -20,88 +18,57 @@ import java.util.Locale
 
 class AdminActivity : AppCompatActivity() {
     private lateinit var database: DatabaseReference
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: AdministradorAdapter
-    private lateinit var spinnerBloques: Spinner
-    private lateinit var bloquesAdapter: ArrayAdapter<String>
     private var currentDaySelected: String = ""
-    private var currentDate: String = ""
-    private var bloquesList = mutableListOf<BloqueHorario>()
-    private var bloquesMap = mutableMapOf<String, String>()
+    private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admi)
-
-        currentDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-        initializeFirebase()
-        initializeViews()
-        setupInitialDay()
-        setupNavigationAndUI()
-    }
-
-    private fun initializeFirebase() {
         FirebaseApp.initializeApp(this)
-        database = FirebaseDatabase.getInstance().reference
-    }
+        initializeDatabase()
 
-    private fun initializeViews() {
-        initializeRecyclerView()
-        initializeSpinner()
-    }
-
-    private fun initializeRecyclerView() {
-        recyclerView = findViewById(R.id.recyclerAdmi)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter = AdministradorAdapter(emptyList()) { usuario ->
-            mostrarDetallesUsuario(usuario)
-        }
-        recyclerView.adapter = adapter
-    }
-
-    private fun mostrarDetallesUsuario(usuario: Usuario) {
-        // Aquí puedes mostrar un diálogo o navegar a una nueva actividad con los detalles del usuario
-        Toast.makeText(this, "Usuario seleccionado: ${usuario.nombre}", Toast.LENGTH_SHORT).show()
-    }
-
-    private fun initializeSpinner() {
-        spinnerBloques = findViewById(R.id.spinnerBloques)
-        bloquesAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, mutableListOf<String>())
-        bloquesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerBloques.adapter = bloquesAdapter
-        setupSpinnerListener()
-    }
-
-    private fun setupSpinnerListener() {
-        spinnerBloques.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val bloqueNombre = parent.getItemAtPosition(position).toString()
-                val bloqueId = bloquesMap[bloqueNombre]
-                bloqueId?.let { fetchUsuarios(it) }
-            }
-
-            override fun onNothingSelected(parent: AdapterView<*>) {}
-        }
-    }
-
-    private fun setupInitialDay() {
+        // Inicializar con el día actual
         val fechaActual = LocalDateTime.now()
         val diaActual = fechaActual.dayOfWeek.value
+
+        // Si es domingo (día 7), establecer el día actual como Lunes
         currentDaySelected = if (diaActual == 7) {
             "Lunes"
         } else {
             val diasDeLaSemana = listOf("Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado")
             diasDeLaSemana[diaActual - 1]
         }
-    }
 
-    private fun setupNavigationAndUI() {
-        setupButtons()
         botonMenu()
+        setupButtons()
         initializeTextView()
         bloquearBotones()
-        fetchBloquesHorarios()
     }
+
+    private fun initializeDatabase() {
+        database = FirebaseDatabase.getInstance().reference
+    }
+
+    private fun initializeTextView() {
+        val fechaActual = LocalDateTime.now()
+        val diaActual = fechaActual.dayOfWeek.value
+
+        // Si es domingo, mostrar información del lunes
+        val diasDeLaSemana = listOf("Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo")
+        val diaSeleccionado = if (diaActual == 7) {
+            "Lunes"
+        } else {
+            diasDeLaSemana[diaActual - 1]
+        }
+
+        val formatoFecha = DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES"))
+        val fechaSeleccionada = calcularFechaSeleccionada(if (diaActual == 7) 1 else diaActual)
+        val fechaFormateada = fechaSeleccionada.format(formatoFecha)
+
+        val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
+        txtFechaSeleccionada.text = "Día $diaSeleccionado $fechaFormateada"
+    }
+
 
     private fun setupButtons() {
         findViewById<Button>(R.id.btnLunes).setOnClickListener {
@@ -158,127 +125,9 @@ class AdminActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchBloquesHorarios() {
-        val fechaSeleccionada = calcularFechaSeleccionada(when(currentDaySelected) {
-            "Lunes" -> 1
-            "Martes" -> 2
-            "Miercoles" -> 3
-            "Jueves" -> 4
-            "Viernes" -> 5
-            "Sabado" -> 6
-            else -> 1
-        })
-        currentDate = fechaSeleccionada.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-
-        // Obtenemos todos los bloques y filtramos en el cliente
-        database.child("bloqueHorarios").get()
-            .addOnSuccessListener { bloquesSnapshot ->
-                bloquesList.clear()
-                bloquesMap.clear()
-                val bloquesNombres = mutableListOf<String>()
-
-                for (bloqueSnapshot in bloquesSnapshot.children) {
-                    val bloque = bloqueSnapshot.getValue(BloqueHorario::class.java)
-                    // Filtramos por el día actual
-                    if (bloque != null && bloque.dia == currentDaySelected) {
-                        bloque.id = bloqueSnapshot.key ?: ""
-                        bloquesList.add(bloque)
-
-                        val bloqueNombre = "${bloque.hora_inicio} - ${bloque.hora_final}"
-                        bloquesNombres.add(bloqueNombre)
-                        bloquesMap[bloqueNombre] = bloque.id
-                    }
-                }
-
-                // Verificamos las asistencias para estos bloques
-                verificarAsistencias(bloquesNombres)
-            }
-            .addOnFailureListener { exception ->
-                Log.e("Firebase", "Error al obtener los bloques horarios", exception)
-                Toast.makeText(this, "Error al obtener los bloques horarios", Toast.LENGTH_SHORT).show()
-            }
-
-    }
-
-    private fun verificarAsistencias(bloquesNombres: List<String>) {
-        database.child("asistencias").child(currentDate).get()
-            .addOnSuccessListener { asistenciasSnapshot ->
-                updateUIWithBloques(bloquesNombres)
-            }
-            .addOnFailureListener { exception ->
-                Log.e("Firebase", "Error al verificar asistencias", exception)
-                Toast.makeText(this, "Error al verificar asistencias", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-    private fun updateUIWithBloques(bloquesNombres: List<String>) {
-        bloquesAdapter.clear()
-        bloquesAdapter.addAll(bloquesNombres)
-        bloquesAdapter.notifyDataSetChanged()
-
-        if (bloquesNombres.isNotEmpty()) {
-            spinnerBloques.setSelection(0)
-            val primerBloqueId = bloquesMap[bloquesNombres[0]]
-            primerBloqueId?.let { fetchUsuarios(it) }
-        } else {
-            adapter.updateUsuarios(emptyList())
-        }
-
-        actualizarTextViewFecha(currentDaySelected)
-    }
-
-    private fun fetchUsuarios(bloqueId: String) {
-        // Intentamos obtener los usuarios de las asistencias
-        database.child("asistencias").child(currentDate).child(bloqueId).child("usuarios").get()
-            .addOnSuccessListener { asistenciasSnapshot ->
-                val usuariosIds = asistenciasSnapshot.children.mapNotNull { it.key }
-                Log.d("fetchUsuarios", "Usuarios encontrados: $usuariosIds")
-
-                if (usuariosIds.isNotEmpty()) {
-                    obtenerDetallesUsuarios(usuariosIds)
-                } else {
-                    adapter.updateUsuarios(emptyList())
-                    Toast.makeText(this, "No se encontraron usuarios para el bloque seleccionado.", Toast.LENGTH_SHORT).show()
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.e("Firebase", "Error al obtener las asistencias", exception)
-                Toast.makeText(this, "Error al obtener las asistencias", Toast.LENGTH_SHORT).show()
-            }
-    }
-
-
-    private fun obtenerDetallesUsuarios(usuariosIds: List<String>) {
-        val usuariosList = mutableListOf<Usuario>()
-        var usuariosCompletados = 0
-
-        for (usuarioId in usuariosIds) {
-            database.child("usuarios").child(usuarioId).get()
-                .addOnSuccessListener { usuarioSnapshot ->
-                    val usuario = usuarioSnapshot.getValue(Usuario::class.java)
-                    if (usuario != null) {
-                        usuario.userId = usuarioId
-                        usuariosList.add(usuario)
-                    }
-
-                    usuariosCompletados++
-                    if (usuariosCompletados == usuariosIds.size) {
-                        adapter.updateUsuarios(usuariosList)
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.e("Firebase", "Error al obtener detalles del usuario", exception)
-                    usuariosCompletados++
-                    if (usuariosCompletados == usuariosIds.size) {
-                        adapter.updateUsuarios(usuariosList)
-                    }
-                }
-        }
-    }
-
     private fun filterbloqueHorarios(dia: String) {
         currentDaySelected = dia
-        fetchBloquesHorarios()
+        actualizarTextViewFecha(dia)
     }
 
     private fun calcularFechaSeleccionada(diaSeleccionado: Int): LocalDateTime {
@@ -298,14 +147,7 @@ class AdminActivity : AppCompatActivity() {
         return fechaActual.plusDays(diferencia.toLong())
     }
 
-    private fun initializeTextView() {
-        val fechaActual = LocalDateTime.now()
-        val formatoFecha = DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES"))
-        val fechaSeleccionada = calcularFechaSeleccionada(if (fechaActual.dayOfWeek.value == 7) 1 else fechaActual.dayOfWeek.value)
 
-        findViewById<TextView>(R.id.txtDiaSemana).text =
-            "Día $currentDaySelected ${fechaSeleccionada.format(formatoFecha)}"
-    }
 
     private fun actualizarTextViewFecha(dia: String) {
         val diaNumerico = when (dia) {
@@ -320,9 +162,10 @@ class AdminActivity : AppCompatActivity() {
 
         val fechaSeleccionada = calcularFechaSeleccionada(diaNumerico)
         val formatoFecha = DateTimeFormatter.ofPattern("dd 'de' MMMM", Locale("es", "ES"))
+        val fechaFormateada = fechaSeleccionada.format(formatoFecha)
 
-        findViewById<TextView>(R.id.txtDiaSemana).text =
-            "Día $dia ${fechaSeleccionada.format(formatoFecha)}"
+        val txtFechaSeleccionada = findViewById<TextView>(R.id.txtDiaSemana)
+        txtFechaSeleccionada.text = "Día $dia $fechaFormateada"
     }
 
     private fun bloquearBotones() {
