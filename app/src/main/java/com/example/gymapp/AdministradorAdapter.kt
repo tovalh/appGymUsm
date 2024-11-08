@@ -23,7 +23,7 @@ class AdministradorAdapter(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val usuario = usuarios[position]
-        holder.nombreTextView.text = usuario.nombre ?: "Sin nombre"
+        holder.nombreTextView.text = usuario.username ?: "Sin nombre"
 
         holder.itemView.setOnClickListener {
             onItemClick(usuario)

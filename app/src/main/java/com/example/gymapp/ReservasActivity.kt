@@ -28,6 +28,10 @@ class ReservasActivity : AppCompatActivity() {
     private var selectedBloque: BloqueHorario? = null
     private var currentDaySelected: String = ""
 
+    // Datos usuario Activo
+    private var userEmail: String? = null
+    private var userName: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.reserva_horario)
@@ -52,6 +56,10 @@ class ReservasActivity : AppCompatActivity() {
         setupButtons()
         initializeTextView()
         bloquearBotones()
+
+        // Obtener los extras del Intent
+        userEmail = intent.getStringExtra("userEmail")
+        userName = intent.getStringExtra("userName")
     }
 
     private fun initializeTextView() {
@@ -354,19 +362,21 @@ class ReservasActivity : AppCompatActivity() {
         )
 
         // Guardar en la base de datos
-        database.child("asistencias")
-            .child(fechaFormateada)
-            .child(horarioId)
-            .child("usuarios")
-            .child("usuario1")
-            .setValue(asistenciaMap)
-            .addOnFailureListener { e ->
-                Toast.makeText(
-                    this,
-                    "Error al registrar asistencia: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+        if (userName != null) {
+            database.child("asistencias")
+                .child(fechaFormateada)
+                .child(horarioId)
+                .child("usuarios")
+                .child(userName!!)
+                .setValue(asistenciaMap)
+                .addOnFailureListener { e ->
+                    Toast.makeText(
+                        this,
+                        "Error al registrar asistencia: ${e.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+        }
     }
 
     private fun crearReserva() {
@@ -388,40 +398,42 @@ class ReservasActivity : AppCompatActivity() {
         val fechaFormateada = fechaSeleccionada.format(formatoFecha)
         val fechaFormateadaMensaje = fechaSeleccionada.format(formatoFechaMensaje)
 
-        database.child("reservas")
-            .child("usuario1")
-            .get()
-            .addOnSuccessListener { snapshot ->
-                val sumaReserva = snapshot.childrenCount + 1
-                val estadoReservadefault = "Activo"
+        if (userName != null) {
+            database.child("reservas")
+                .child(userName!!)
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    val sumaReserva = snapshot.childrenCount + 1
+                    val estadoReservadefault = "Activo"
 
-                val reservaMap = hashMapOf(
-                    "dia" to selectedBloque?.dia,
-                    "fecha" to fechaFormateada,
-                    "hora_final" to selectedBloque?.hora_final,
-                    "hora_inicio" to selectedBloque?.hora_inicio,
-                    "estado" to estadoReservadefault
-                )
+                    val reservaMap = hashMapOf(
+                        "dia" to selectedBloque?.dia,
+                        "fecha" to fechaFormateada,
+                        "hora_final" to selectedBloque?.hora_final,
+                        "hora_inicio" to selectedBloque?.hora_inicio,
+                        "estado" to estadoReservadefault
+                    )
 
-                database.child("reservas")
-                    .child("usuario1")
-                    .child("reserva$sumaReserva")
-                    .setValue(reservaMap)
-                    .addOnSuccessListener {
-                        Toast.makeText(
-                            this,
-                            "Reserva confirmada para: $fechaFormateadaMensaje",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        fetchMenuItems()
-                    }
-                    .addOnFailureListener { e ->
-                        Toast.makeText(
-                            this,
-                            "Error al confirmar la reserva: ${e.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-            }
+                    database.child("reservas")
+                        .child(userName!!)
+                        .child("reserva$sumaReserva")
+                        .setValue(reservaMap)
+                        .addOnSuccessListener {
+                            Toast.makeText(
+                                this,
+                                "Reserva confirmada para: $fechaFormateadaMensaje",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            fetchMenuItems()
+                        }
+                        .addOnFailureListener { e ->
+                            Toast.makeText(
+                                this,
+                                "Error al confirmar la reserva: ${e.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                }
+        }
     }
 }

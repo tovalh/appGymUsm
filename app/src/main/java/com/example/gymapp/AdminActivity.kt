@@ -142,20 +142,127 @@ class AdminActivity : AppCompatActivity() {
         adaptador = AdaptadorUsuario(
             usuarios,
             onAsistenciaClick = { usuario ->
-                // Manejar click en asistencia
+                marcarAsistencia(usuario.username)
             },
             onCancelarClick = { usuario ->
-                // Manejar click en cancelar
+                marcarInasistencia(usuario.username)
             }
         )
         recyclerView.adapter = adaptador
+    }
+
+    private fun marcarAsistencia(username: String) {
+        // Obtener la fecha formateada para la base de datos
+        val fechaFormateada = calcularFechaSeleccionada(
+            when (currentDaySelected) {
+                "Lunes" -> 1
+                "Martes" -> 2
+                "Miercoles" -> 3
+                "Jueves" -> 4
+                "Viernes" -> 5
+                "Sabado" -> 6
+                else -> 1
+            }
+        ).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
+        // Actualizar asistencia
+        val asistenciaRef = database.child("asistencias")
+            .child(fechaFormateada)
+            .child(horarioSeleccionado)
+            .child("usuarios")
+            .child(username)
+
+        val updates = hashMapOf<String, Any>(
+            "asistio" to true,
+            "hora_marcacion" to LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
+        )
+
+        asistenciaRef.updateChildren(updates)
+            .addOnSuccessListener {
+                // Actualizar estado de la reserva
+                actualizarEstadoReserva(username, fechaFormateada, "Asistido")
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al marcar asistencia: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun marcarInasistencia(username: String) {
+        // Obtener la fecha formateada para la base de datos
+        val fechaFormateada = calcularFechaSeleccionada(
+            when (currentDaySelected) {
+                "Lunes" -> 1
+                "Martes" -> 2
+                "Miercoles" -> 3
+                "Jueves" -> 4
+                "Viernes" -> 5
+                "Sabado" -> 6
+                else -> 1
+            }
+        ).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
+        // Actualizar asistencia
+        val asistenciaRef = database.child("asistencias")
+            .child(fechaFormateada)
+            .child(horarioSeleccionado)
+            .child("usuarios")
+            .child(username)
+
+        val updates = hashMapOf<String, Any>(
+            "asistio" to false,
+            "hora_marcacion" to LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))
+        )
+
+        asistenciaRef.updateChildren(updates)
+            .addOnSuccessListener {
+                // Actualizar estado de la reserva
+                actualizarEstadoReserva(username, fechaFormateada, "Inasistido")
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error al marcar inasistencia: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun actualizarEstadoReserva(username: String, fecha: String, nuevoEstado: String) {
+        // Buscar la reserva correspondiente
+        database.child("reservas")
+            .child(username)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    // Buscar la reserva que coincida con la fecha
+                    for (reservaSnapshot in snapshot.children) {
+                        val fechaReserva = reservaSnapshot.child("fecha").getValue(String::class.java)
+                        if (fechaReserva == fecha) {
+                            // Actualizar el estado
+                            reservaSnapshot.ref.child("estado").setValue(nuevoEstado)
+                                .addOnSuccessListener {
+                                    Toast.makeText(this@AdminActivity,
+                                        "Estado actualizado correctamente",
+                                        Toast.LENGTH_SHORT).show()
+                                }
+                                .addOnFailureListener { e ->
+                                    Toast.makeText(this@AdminActivity,
+                                        "Error al actualizar estado: ${e.message}",
+                                        Toast.LENGTH_SHORT).show()
+                                }
+                            break
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(this@AdminActivity,
+                        "Error al buscar reserva: ${error.message}",
+                        Toast.LENGTH_SHORT).show()
+                }
+            })
     }
 
     private fun actualizarRecyclerView(nuevosUsuarios: List<Usuario>) {
         usuarios.clear()
         usuarios.addAll(nuevosUsuarios)
         adaptador.notifyDataSetChanged()
-        Log.d("RecyclerView", "Actualizando con usuarios: ${nuevosUsuarios.map { it.nombre }}")
+        Log.d("RecyclerView", "Actualizando con usuarios: ${nuevosUsuarios.map { it.username }}")
     }
 
 

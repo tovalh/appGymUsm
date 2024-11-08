@@ -29,8 +29,8 @@ class AdaptadorUsuario(
 
     override fun onBindViewHolder(holder: AsistenciaViewHolder, position: Int) {
         val usuario = usuarios[position]
-        holder.nombreTextView.text = usuario.nombre
-        Log.d("Adapter", "Binding usuario: ${usuario.nombre}")
+        holder.nombreTextView.text = usuario.username
+        Log.d("Adapter", "Binding usuario: ${usuario.username}")
         holder.btnAsistir.setOnClickListener { onAsistenciaClick(usuario) }
         holder.btnCancelar.setOnClickListener { onCancelarClick(usuario) }
     }

@@ -20,6 +20,11 @@ class HomeActivity : AppCompatActivity() {
 
     private lateinit var database: DatabaseReference
 
+    // Datos usuario Activo
+    private var userEmail: String? = null
+    private var userName: String? = null
+    private var userIsAdmin: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
@@ -28,6 +33,11 @@ class HomeActivity : AppCompatActivity() {
         setupButtons()
         botonMenu()
         actualizarProximaReserva()
+
+        // Obtener los extras del Intent
+        userEmail = intent.getStringExtra("userEmail")
+        userName = intent.getStringExtra("userName")
+        userIsAdmin = intent.getBooleanExtra("userIsAdmin", false)
     }
 
     override fun onResume() {
@@ -55,6 +65,8 @@ class HomeActivity : AppCompatActivity() {
     // Nueva función para navegar a la página de administrador
     private fun irPaginaAdmi() {
         val intent = Intent(this, AdminActivity::class.java)
+        intent.putExtra("userEmail", userEmail)
+        intent.putExtra("userName", userName)
         startActivity(intent)
     }
 
@@ -69,12 +81,16 @@ class HomeActivity : AppCompatActivity() {
 
                 R.id.nav_calendar -> {
                     val intentCalendario = Intent(this, ReservasActivity::class.java)
+                    intentCalendario.putExtra("userEmail", userEmail)
+                    intentCalendario.putExtra("userName", userName)
                     startActivity(intentCalendario)
                     true
                 }
 
                 R.id.nav_clock -> {
                     val intentReloj = Intent(this, HorarioActivity::class.java)
+                    intentReloj.putExtra("userEmail", userEmail)
+                    intentReloj.putExtra("userName", userName)
                     startActivity(intentReloj)
                     true
                 }
@@ -86,6 +102,8 @@ class HomeActivity : AppCompatActivity() {
 
     private fun irReservas() {
         val intent = Intent(this, ReservasActivity::class.java)
+        intent.putExtra("userEmail", userEmail)
+        intent.putExtra("userName", userName)
         startActivity(intent)
     }
 
