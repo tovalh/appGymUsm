@@ -34,6 +34,11 @@ class AdminActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private var horarioSeleccionado: String = ""
 
+    // Datos usuario Activo
+    private var userEmail: String? = null
+    private var userName: String? = null
+    private var userIsAdmin: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admi)
@@ -58,6 +63,11 @@ class AdminActivity : AppCompatActivity() {
         setupButtons()
         initializeTextView()
         bloquearBotones()
+
+        // Obtener los extras del Intent
+        userEmail = intent.getStringExtra("userEmail")
+        userName = intent.getStringExtra("userName")
+        userIsAdmin = intent.getBooleanExtra("userIsAdmin", false)
     }
 
     private fun crearSpinner() {
@@ -352,18 +362,27 @@ class AdminActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_home -> {
                     val intentHome = Intent(this, HomeActivity::class.java)
+                    intent.putExtra("userEmail", userEmail)
+                    intent.putExtra("userName", userName)
+                    intent.putExtra("userIsAdmin", userIsAdmin)
                     startActivity(intentHome)
                     true
                 }
 
                 R.id.nav_calendar -> {
                     val intentCalendar = Intent(this, ReservasActivity::class.java)
+                    intent.putExtra("userEmail", userEmail)
+                    intent.putExtra("userName", userName)
+                    intent.putExtra("userIsAdmin", userIsAdmin)
                     startActivity(intentCalendar)
                     true
                 }
 
                 R.id.nav_clock -> {
                     val intentReloj = Intent(this, HorarioActivity::class.java)
+                    intent.putExtra("userEmail", userEmail)
+                    intent.putExtra("userName", userName)
+                    intent.putExtra("userIsAdmin", userIsAdmin)
                     startActivity(intentReloj)
                     true
                 }

@@ -31,6 +31,7 @@ class ReservasActivity : AppCompatActivity() {
     // Datos usuario Activo
     private var userEmail: String? = null
     private var userName: String? = null
+    private var userIsAdmin: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,6 +61,7 @@ class ReservasActivity : AppCompatActivity() {
         // Obtener los extras del Intent
         userEmail = intent.getStringExtra("userEmail")
         userName = intent.getStringExtra("userName")
+        userIsAdmin = intent.getBooleanExtra("userIsAdmin", false)
     }
 
     private fun initializeTextView() {
@@ -89,6 +91,9 @@ class ReservasActivity : AppCompatActivity() {
             when (item.itemId) {
                 R.id.nav_home -> {
                     val intentHome = Intent(this, HomeActivity::class.java)
+                    intentHome.putExtra("userEmail", userEmail)
+                    intentHome.putExtra("userName", userName)
+                    intentHome.putExtra("userIsAdmin", userIsAdmin)
                     startActivity(intentHome)
                     true
                 }
@@ -99,6 +104,9 @@ class ReservasActivity : AppCompatActivity() {
 
                 R.id.nav_clock -> {
                     val intentReloj = Intent(this, HorarioActivity::class.java)
+                    intentReloj.putExtra("userEmail", userEmail)
+                    intentReloj.putExtra("userName", userName)
+                    intentReloj.putExtra("userIsAdmin", userIsAdmin)
                     startActivity(intentReloj)
                     true
                 }

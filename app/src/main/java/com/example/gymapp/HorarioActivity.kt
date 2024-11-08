@@ -23,6 +23,11 @@ class HorarioActivity: AppCompatActivity(){
 
     private lateinit var database: DatabaseReference
 
+    // Datos usuario Activo
+    private var userEmail: String? = null
+    private var userName: String? = null
+    private var userIsAdmin: Boolean = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +36,11 @@ class HorarioActivity: AppCompatActivity(){
         initializeDatabase() // Inicializa la referencia a la base de datos de Firebase
         fetchMenuItems()
         botonMenu()
+
+        // Obtener los extras del Intent
+        userEmail = intent.getStringExtra("userEmail")
+        userName = intent.getStringExtra("userName")
+        userIsAdmin = intent.getBooleanExtra("userIsAdmin", false)
     }
 
     // Inicializa la referencia a la base de datos de Firebase
@@ -41,7 +51,7 @@ class HorarioActivity: AppCompatActivity(){
     // Obtienelos elementos del menú desde Firebase
     private fun fetchMenuItems() {
         database.child("reservas")
-            .child("usuario1")
+            .child(userName.toString())
             .get().addOnSuccessListener { snapshot -> // Obtiene datos del nodo
             val reservasLista = mutableListOf<Reserva>() // Crea una lista para almacenar los elementos del menú
             for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
@@ -148,11 +158,17 @@ class HorarioActivity: AppCompatActivity(){
             when (item.itemId) {
                 R.id.nav_home -> {
                     val intentHome = Intent(this, HomeActivity::class.java)
+                    intentHome.putExtra("userEmail", userEmail)
+                    intentHome.putExtra("userName", userName)
+                    intentHome.putExtra("userIsAdmin", userIsAdmin)
                     startActivity(intentHome)
                     true
                 }
                 R.id.nav_calendar -> {
                     val intentCalendario = Intent(this, ReservasActivity::class.java)
+                    intentCalendario.putExtra("userEmail", userEmail)
+                    intentCalendario.putExtra("userName", userName)
+                    intentCalendario.putExtra("userIsAdmin", userIsAdmin)
                     startActivity(intentCalendario)
                     true
                 }

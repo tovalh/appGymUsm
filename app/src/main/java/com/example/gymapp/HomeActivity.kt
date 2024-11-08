@@ -67,6 +67,7 @@ class HomeActivity : AppCompatActivity() {
         val intent = Intent(this, AdminActivity::class.java)
         intent.putExtra("userEmail", userEmail)
         intent.putExtra("userName", userName)
+        intent.putExtra("userIsAdmin", userIsAdmin)
         startActivity(intent)
     }
 
@@ -81,16 +82,18 @@ class HomeActivity : AppCompatActivity() {
 
                 R.id.nav_calendar -> {
                     val intentCalendario = Intent(this, ReservasActivity::class.java)
-                    intentCalendario.putExtra("userEmail", userEmail)
-                    intentCalendario.putExtra("userName", userName)
+                    intent.putExtra("userEmail", userEmail)
+                    intent.putExtra("userName", userName)
+                    intent.putExtra("userIsAdmin", userIsAdmin)
                     startActivity(intentCalendario)
                     true
                 }
 
                 R.id.nav_clock -> {
                     val intentReloj = Intent(this, HorarioActivity::class.java)
-                    intentReloj.putExtra("userEmail", userEmail)
-                    intentReloj.putExtra("userName", userName)
+                    intent.putExtra("userEmail", userEmail)
+                    intent.putExtra("userName", userName)
+                    intent.putExtra("userIsAdmin", userIsAdmin)
                     startActivity(intentReloj)
                     true
                 }
@@ -104,6 +107,7 @@ class HomeActivity : AppCompatActivity() {
         val intent = Intent(this, ReservasActivity::class.java)
         intent.putExtra("userEmail", userEmail)
         intent.putExtra("userName", userName)
+        intent.putExtra("userIsAdmin", userIsAdmin)
         startActivity(intent)
     }
 
