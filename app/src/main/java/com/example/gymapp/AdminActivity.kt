@@ -34,7 +34,7 @@ class AdminActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private var horarioSeleccionado: String = ""
 
-    // Datos usuario Activo
+    // Creacion de Variables
     private var userEmail: String? = null
     private var userName: String? = null
     private var userIsAdmin: Boolean = false
@@ -70,6 +70,8 @@ class AdminActivity : AppCompatActivity() {
         userIsAdmin = intent.getBooleanExtra("userIsAdmin", false)
     }
 
+    // Spinner Principal
+
     private fun crearSpinner() {
         val horarios = arrayOf(
             "8:20-9:30",
@@ -87,7 +89,7 @@ class AdminActivity : AppCompatActivity() {
 
         val spinner = findViewById<Spinner>(R.id.spinnerBloques)
 
-        // Configura el adaptador para que utilice dos layouts diferentes
+        // Configurar el adaptador para que utilice dos layouts diferentes
         val adapter = ArrayAdapter(
             this,
             R.layout.spinner_item,       // Vista principal con el ícono
@@ -198,7 +200,6 @@ class AdminActivity : AppCompatActivity() {
     }
 
     private fun marcarInasistencia(username: String) {
-        // Obtener la fecha formateada para la base de datos
         val fechaFormateada = calcularFechaSeleccionada(
             when (currentDaySelected) {
                 "Lunes" -> 1
@@ -225,11 +226,87 @@ class AdminActivity : AppCompatActivity() {
 
         asistenciaRef.updateChildren(updates)
             .addOnSuccessListener {
-                // Actualizar estado de la reserva
                 actualizarEstadoReserva(username, fechaFormateada, "Inasistido")
+                verificarYAplicarPenalizacion(username)
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error al marcar inasistencia: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun verificarYAplicarPenalizacion(username: String) {
+        // Obtener el número de inasistencias permitidas de la configuración
+        database.child("configuracion_sistema")
+            .child("restricciones")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(configSnapshot: DataSnapshot) {
+                    val inasistenciasMaximas = configSnapshot.child("inasistencias_maximas").getValue(Int::class.java) ?: 3
+                    val diasRestriccion = configSnapshot.child("dias_restriccion").getValue(Int::class.java) ?: 7
+
+                    // Contar inasistencias del usuario en el último mes
+                    contarInasistenciasRecientes(username) { inasistenciasActuales ->
+                        if (inasistenciasActuales >= inasistenciasMaximas) {
+                            aplicarPenalizacion(username, inasistenciasActuales, diasRestriccion)
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("Firebase", "Error al obtener configuración", error.toException())
+                }
+            })
+    }
+
+    private fun contarInasistenciasRecientes(username: String, callback: (Int) -> Unit) {
+        // Obtener fecha hace un mes
+        val fechaInicio = LocalDateTime.now().minusMonths(1)
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val fechaFin = LocalDateTime.now()
+            .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+
+        database.child("reservas")
+            .child(username)
+            .orderByChild("fecha")
+            .startAt(fechaInicio)
+            .endAt(fechaFin)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val inasistencias = snapshot.children.count {
+                        it.child("estado").getValue(String::class.java) == "Inasistido"
+                    }
+                    callback(inasistencias)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e("Firebase", "Error al contar inasistencias", error.toException())
+                    callback(0)
+                }
+            })
+    }
+
+    private fun aplicarPenalizacion(username: String, inasistencias: Int, diasRestriccion: Int) {
+        val fechaInicio = LocalDateTime.now()
+        val fechaFin = fechaInicio.plusDays(diasRestriccion.toLong())
+
+        val penalizacion = hashMapOf(
+            "fecha_inicio" to fechaInicio.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+            "fecha_fin" to fechaFin.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")),
+            "inasistencias_acumuladas" to inasistencias,
+            "motivo" to "Exceso de inasistencias"
+        )
+
+        database.child("penalizaciones_activas")
+            .child(username)
+            .setValue(penalizacion)
+            .addOnSuccessListener {
+                Toast.makeText(
+                    this,
+                    "Penalización aplicada por exceso de inasistencias",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            .addOnFailureListener { e ->
+                Log.e("Firebase", "Error al aplicar penalización", e)
             }
     }
 
