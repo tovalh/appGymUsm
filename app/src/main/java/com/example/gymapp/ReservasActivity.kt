@@ -15,9 +15,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
 
 class ReservasActivity : AppCompatActivity() {
@@ -52,6 +55,8 @@ class ReservasActivity : AppCompatActivity() {
             diasDeLaSemana[diaActual - 1]
         }
 
+        reseteoCuposDomingo()
+
         fetchMenuItems()
         botonMenu()
         setupButtons()
@@ -62,6 +67,10 @@ class ReservasActivity : AppCompatActivity() {
         userEmail = intent.getStringExtra("userEmail")
         userName = intent.getStringExtra("userName")
         userIsAdmin = intent.getBooleanExtra("userIsAdmin", false)
+    }
+
+    private fun resetearCupos(){
+
     }
 
     private fun initializeTextView() {
@@ -443,5 +452,49 @@ class ReservasActivity : AppCompatActivity() {
                         }
                 }
         }
+    }
+
+    private fun reseteoCuposDomingo() {
+        val calendar = Calendar.getInstance()
+        val diaSemana = calendar.get(Calendar.DAY_OF_WEEK)
+
+        // Si es domingo, verificamos si ya se resetearon los cupos
+        if (diaSemana == Calendar.SUNDAY) {
+            database.child("configuracion_sistema")
+                .child("ultimo_reset")
+                .get()
+                .addOnSuccessListener { snapshot ->
+                    val ultimoReset = snapshot.getValue(String::class.java)
+                    val fechaHoy = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+
+                    // Si no hay fecha de último reset o es diferente a hoy, hacemos el reset
+                    if (ultimoReset == null || ultimoReset != fechaHoy) {
+                        resetearCupos(fechaHoy)
+                    }
+                }
+        }
+    }
+
+    private fun resetearCupos(fechaHoy: String) {
+        database.child("bloqueHorarios").get()
+            .addOnSuccessListener { snapshot ->
+                snapshot.children.forEach { bloqueSnapshot ->
+                    database.child("bloqueHorarios")
+                        .child(bloqueSnapshot.key ?: "")
+                        .child("cupos_disponibles")
+                        .setValue(20)
+                }
+
+                // Guardamos la fecha del reset
+                database.child("configuracion_sistema")
+                    .child("ultimo_reset")
+                    .setValue(fechaHoy)
+
+                Log.d("ResetCupos", "Cupos reseteados exitosamente")
+                Toast.makeText(this, "Cupos reseteados para la nueva semana", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener { e ->
+                Log.e("ResetCupos", "Error al resetear cupos", e)
+            }
     }
 }
