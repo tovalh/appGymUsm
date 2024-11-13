@@ -74,11 +74,18 @@ class HorarioActivity: AppCompatActivity(){
                 .child(it)
                 .get().addOnSuccessListener { snapshot -> // Obtiene datos del nodo
                 val reservasLista = mutableListOf<Reserva>() // Crea una lista para almacenar los elementos del menú
-                for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
+
+                    // Obtener la fecha actual sin la hora
+                    val formatoFecha = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    val fechaActual = formatoFecha.format(Calendar.getInstance().time)
+
+                    for (itemSnapshot in snapshot.children) { // Itera a través de los datos obtenidos
                     val reserva = itemSnapshot.getValue(Reserva::class.java) // Convierte los datos a un objeto MenuItem
                     if (reserva != null && reserva.estado == "Activo") {
-                        reserva.id = itemSnapshot.key ?: ""
-                        reservasLista.add(reserva) // Agrega el elemento del menú a la lista
+                        if (reserva.fecha >= fechaActual) {
+                            reserva.id = itemSnapshot.key ?: ""
+                            reservasLista.add(reserva) // Agrega el elemento del menú a la lista
+                        }
                     }
                 }
                     // Ordenar la lista por fecha antes de actualizar la UI
