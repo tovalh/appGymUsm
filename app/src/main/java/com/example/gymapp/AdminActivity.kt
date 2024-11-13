@@ -567,6 +567,7 @@ class AdminActivity : AppCompatActivity() {
     private fun filterbloqueHorarios(dia: String) {
         currentDaySelected = dia
         actualizarTextViewFecha(dia)
+        cargarUsuarios()
     }
 
     private fun calcularFechaSeleccionada(diaSeleccionado: Int): LocalDateTime {
