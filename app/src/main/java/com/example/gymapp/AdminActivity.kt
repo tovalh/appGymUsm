@@ -62,7 +62,7 @@ class AdminActivity : AppCompatActivity() {
         botonMenu()
         setupButtons()
         initializeTextView()
-        bloquearBotones()
+//        bloquearBotones()
 
         // Obtener los extras del Intent
         userEmail = intent.getStringExtra("userEmail")
@@ -608,43 +608,43 @@ class AdminActivity : AppCompatActivity() {
         txtFechaSeleccionada.text = "Día $dia $fechaFormateada"
     }
 
-    private fun bloquearBotones() {
-        val fechaActual = LocalDateTime.now()
-        val diaActual = fechaActual.dayOfWeek.value
-
-        val btnLunes = findViewById<Button>(R.id.btnLunes)
-        val btnMartes = findViewById<Button>(R.id.btnMartes)
-        val btnMiercoles = findViewById<Button>(R.id.btnMiercoles)
-        val btnJueves = findViewById<Button>(R.id.btnJueves)
-        val btnViernes = findViewById<Button>(R.id.btnViernes)
-
-        // Si es domingo, no deshabilitar ningún botón ya que mostraremos la próxima semana
-        if (diaActual != 7) {
-            when (diaActual) {
-                2 -> btnLunes.isEnabled = false
-                3 -> {
-                    btnLunes.isEnabled = false
-                    btnMartes.isEnabled = false
-                }
-                4 -> {
-                    btnLunes.isEnabled = false
-                    btnMartes.isEnabled = false
-                    btnMiercoles.isEnabled = false
-                }
-                5 -> {
-                    btnLunes.isEnabled = false
-                    btnMartes.isEnabled = false
-                    btnMiercoles.isEnabled = false
-                    btnJueves.isEnabled = false
-                }
-                6 -> {
-                    btnLunes.isEnabled = false
-                    btnMartes.isEnabled = false
-                    btnMiercoles.isEnabled = false
-                    btnJueves.isEnabled = false
-                    btnViernes.isEnabled = false
-                }
-            }
-        }
-    }
+//    private fun bloquearBotones() {
+//        val fechaActual = LocalDateTime.now()
+//        val diaActual = fechaActual.dayOfWeek.value
+//
+//        val btnLunes = findViewById<Button>(R.id.btnLunes)
+//        val btnMartes = findViewById<Button>(R.id.btnMartes)
+//        val btnMiercoles = findViewById<Button>(R.id.btnMiercoles)
+//        val btnJueves = findViewById<Button>(R.id.btnJueves)
+//        val btnViernes = findViewById<Button>(R.id.btnViernes)
+//
+//        // Si es domingo, no deshabilitar ningún botón ya que mostraremos la próxima semana
+//        if (diaActual != 7) {
+//            when (diaActual) {
+//                2 -> btnLunes.isEnabled = false
+//                3 -> {
+//                    btnLunes.isEnabled = false
+//                    btnMartes.isEnabled = false
+//                }
+//                4 -> {
+//                    btnLunes.isEnabled = false
+//                    btnMartes.isEnabled = false
+//                    btnMiercoles.isEnabled = false
+//                }
+//                5 -> {
+//                    btnLunes.isEnabled = false
+//                    btnMartes.isEnabled = false
+//                    btnMiercoles.isEnabled = false
+//                    btnJueves.isEnabled = false
+//                }
+//                6 -> {
+//                    btnLunes.isEnabled = false
+//                    btnMartes.isEnabled = false
+//                    btnMiercoles.isEnabled = false
+//                    btnJueves.isEnabled = false
+//                    btnViernes.isEnabled = false
+//                }
+//            }
+//        }
+//    }
 }
