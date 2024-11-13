@@ -200,21 +200,28 @@ class HomeActivity : AppCompatActivity() {
         val userNombre = userName ?: return
 
         database.child("reservas").child(userNombre).get().addOnSuccessListener { snapshot ->
-            var totalReservas = 0
-            var totalAsistencias = 0
+
+            var totalAsistido = 0  // Conteo de asistencias
+            var totalReservas = 0  // Total de intentos (excluye cancelados)
 
             snapshot.children.forEach { reservaSnapshot ->
                 val reserva = reservaSnapshot.getValue(Reserva::class.java)
                 if (reserva != null) {
-                    totalReservas++
-                    if (reserva.estado == "Asistido") {
-                        totalAsistencias++
+                    when (reserva.estado) {
+                        "Asistido" -> {
+                            totalAsistido++
+                            totalReservas++  // Se cuenta como intento y asistencia
+                        }
+                        "Inasistido",  -> {
+                            totalReservas++  // Solo se cuenta como intento, no como asistencia
+                        }
+                        // "Cancelado" no se cuenta en absoluto
                     }
                 }
             }
 
             if (totalReservas > 0) {
-                val porcentajeAsistencia = (totalAsistencias * 100) / totalReservas
+                val porcentajeAsistencia = (totalAsistido * 100) /totalReservas
                 tvPorcentajeAsistencia.text = "$porcentajeAsistencia%"
             } else {
                 tvPorcentajeAsistencia.text = "N/A"
@@ -224,6 +231,7 @@ class HomeActivity : AppCompatActivity() {
             tvPorcentajeAsistencia.text = "Error"
         }
     }
+
 
 
 
