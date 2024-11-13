@@ -2,6 +2,7 @@ package com.example.gymapp
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -43,11 +44,17 @@ class LoginActivity : AppCompatActivity() {
         database.child("users").child(email.replace(".", "_")).addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
-                    val user = snapshot.getValue(Usuario::class.java)
-                    if (user?.password == password) {
+                    // Leer valores directamente del snapshot
+                    val dbPassword = snapshot.child("password").getValue(String::class.java)
+                    val dbIsAdmin = snapshot.child("isAdmin").getValue(Boolean::class.java) ?: false
+                    val dbUsername = snapshot.child("username").getValue(String::class.java) ?: ""
+
+                    Log.d("LoginActivity", "Valores leídos - isAdmin: $dbIsAdmin, username: $dbUsername")
+
+                    if (dbPassword == password) {
                         userEmail = email
-                        userName = user.username
-                        userIsAdmin = user.isAdmin
+                        userName = dbUsername
+                        userIsAdmin = dbIsAdmin
 
                         if (userIsAdmin) {
                             Toast.makeText(this@LoginActivity, "Bienvenido administrador $userName", Toast.LENGTH_SHORT).show()

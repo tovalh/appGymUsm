@@ -32,13 +32,19 @@ class HomeActivity : AppCompatActivity() {
         setContentView(R.layout.activity_home)
         FirebaseApp.initializeApp(this)
         initializeDatabase()
-        setupButtons()
-        botonMenu()
-
         // Obtener los extras del Intent
         userEmail = intent.getStringExtra("userEmail")
         userName = intent.getStringExtra("userName")
         userIsAdmin = intent.getBooleanExtra("userIsAdmin", false)
+
+        // Agregar logs de debug
+        Log.d("HomeActivity", "userEmail: $userEmail")
+        Log.d("HomeActivity", "userName: $userName")
+        Log.d("HomeActivity", "userIsAdmin: $userIsAdmin")
+
+        //Botones Admin - Usuario
+        setupButtons()
+        botonMenu()
 
         // Actualizar información del usuario
         actualizarProximaReserva()
@@ -61,14 +67,12 @@ class HomeActivity : AppCompatActivity() {
         }
 
         val botonAdmi = findViewById<Button>(R.id.botonAdmi)
+        botonAdmi.visibility = if (userIsAdmin) android.view.View.VISIBLE else android.view.View.GONE
 
         if (userIsAdmin) {
             botonAdmi.setOnClickListener {
                 irPaginaAdmi()
             }
-            botonAdmi.visibility = android.view.View.VISIBLE
-        } else {
-            botonAdmi.visibility = android.view.View.GONE
         }
     }
 

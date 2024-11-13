@@ -2,18 +2,18 @@ package com.example.gymapp.model
 
 // Clase base para representar un Usuario
 open class UsuarioItem(
-    open val username: String = "",
-    open val asistio: Boolean = false,
-    open val hora_marcacion: String = "",
-    open val password: String = "",
-    open val isAdmin: Boolean = false
+    open var username: String = "",
+    open var asistio: Boolean = false,
+    open var hora_marcacion: String = "",
+    open var password: String = "",
+    open var isAdmin: Boolean = false
 )
 
 // Clase para representar un Usuario
 data class Usuario(
-    override val username: String = "",
-    override val asistio: Boolean = false,
-    override val hora_marcacion: String = "" ,
-    override val password: String = "",
-    override val isAdmin: Boolean = false
+    override var username: String = "",
+    override var asistio: Boolean = false,
+    override var hora_marcacion: String = "" ,
+    override var password: String = "",
+    override var isAdmin: Boolean = false
 ) : UsuarioItem(username, asistio, hora_marcacion, password, isAdmin)
