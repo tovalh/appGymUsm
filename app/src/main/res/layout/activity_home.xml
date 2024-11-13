@@ -127,10 +127,11 @@
                 android:textSize="18sp" />
 
             <TextView
+                android:id="@+id/tvPorcentajeAsistencia"
                 android:layout_width="match_parent"
                 android:layout_height="180dp"
                 android:fontFamily="@font/roboto_mono_medium"
-                android:text="92%"
+                android:text="Cargando %"
                 android:textAlignment="center"
                 android:textColor="#F7AE00"
                 android:textSize="115dp"
