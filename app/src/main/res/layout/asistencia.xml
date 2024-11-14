@@ -1,126 +1,136 @@
-<LinearLayout
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:background="@android:color/white"
-    android:elevation="4dp"
-    android:padding="24dp">
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
 
-    <!-- Botón de cierre negro y alineado a la derecha -->
-    <ImageButton
-        android:id="@+id/btnCerrar"
-        android:layout_width="26dp"
-        android:layout_height="26dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="10dp"
-        android:layout_gravity="end"
-        android:src="@drawable/close"
-        android:background="?android:selectableItemBackgroundBorderless"
-        android:scaleType="fitCenter"
-        app:tint="#000000" />
-
-    <!-- Título centrado -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ajustes de asistencia"
-        android:textSize="22sp"
-        android:textStyle="bold"
-        android:textColor="@color/Azul_usm"
-        android:gravity="center"
-        android:layout_gravity="center_horizontal"
-        />
-
-    <!-- Línea divisoria debajo del título -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#76737B"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        />
-
-    <!-- Primer campo de texto y entrada de datos -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Horas Máximas para Cancelación"
-        android:textSize="16sp"
-        android:textColor="#000000"
-        android:layout_marginBottom="4dp"
-        />
-
-    <EditText
-        android:id="@+id/HorasMaximas"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Ingrese horas"
-        android:background="@drawable/edittext_background"
-        android:padding="10dp"
-        android:textColorHint="#8b8b8b"
-        android:textColor="#000000"
-        android:textSize="16sp"
-        />
+        android:orientation="vertical"
+        android:background="@android:color/white"
+        android:elevation="4dp"
+        android:padding="24dp">
 
-    <!-- Segundo campo de texto y entrada de datos -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Número de inasistencias para Penalización"
-        android:textSize="16sp"
-        android:textColor="#000000"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="4dp"
-        />
+        <!-- Close button aligned to the right -->
+        <ImageButton
+            android:id="@+id/btnCerrar"
+            android:layout_width="26dp"
+            android:layout_height="26dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="10dp"
+            android:layout_gravity="end"
+            android:src="@drawable/close"
+            android:background="?android:selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"
+            app:tint="#000000" />
 
-    <EditText
-        android:id="@+id/Inasistencias"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Ingrese inasistencias"
-        android:background="@drawable/edittext_background"
-        android:padding="10dp"
-        android:textColorHint="#8b8b8b"
-        android:textColor="#000000"
-        android:textSize="16sp"
-        />
+        <!-- Centered title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ajustes de asistencia"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/Azul_usm"
+            android:gravity="center"
+            android:layout_gravity="center_horizontal"
+            />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Tiempo de Restricción por Inasistencias"
-        android:textSize="16sp"
-        android:textColor="#000000"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="4dp"
-        />
+        <!-- Divider line below the title -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#76737B"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            />
 
-    <Spinner
-        android:id="@+id/spinnerRestriccion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/spiner_style"
-        android:padding="10dp"
-        />
+        <!-- First text field and input -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Horas Máximas para Cancelación"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:layout_marginBottom="4dp"
+            />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnGuardar"
-        android:layout_width="300dp"
-        android:layout_height="45dp"
-        android:layout_gravity="center"
-        android:layout_margin="16dp"
-        android:background="@drawable/botonredondoazul"
-        android:fontFamily="@font/roboto_mono_medium"
-        android:text="Guardar Cambios"
-        android:textAlignment="center"
-        android:textColor="@color/normal_background"
-        android:textSize="18sp"
-        app:cornerRadius="24dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-</LinearLayout>
+        <EditText
+            android:id="@+id/HorasMaximas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ingrese horas"
+            android:background="@drawable/edittext_background"
+            android:padding="10dp"
+            android:textColorHint="#8b8b8b"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            />
+
+        <!-- Second text field and input -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Número de inasistencias por semana"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="4dp"
+            />
+
+        <EditText
+            android:id="@+id/Inasistencias"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Ingrese inasistencias"
+            android:background="@drawable/edittext_background"
+            android:padding="10dp"
+            android:textColorHint="#8b8b8b"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            />
+
+        <!-- Third text field and spinner -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="Tiempo de Restricción por Inasistencias"
+            android:textSize="16sp"
+            android:textColor="#000000"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="4dp"
+            />
+
+        <Spinner
+            android:id="@+id/spinnerRestriccion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/spiner_style"
+            android:padding="10dp"
+            />
+
+        <!-- Save button -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnGuardar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/botonredondoazul"
+            android:fontFamily="@font/roboto_mono_medium"
+            android:text="Guardar Cambios"
+            android:textAlignment="center"
+            android:textColor="@color/normal_background"
+            android:textSize="18sp"
+            app:cornerRadius="24dp"
+            />
+
+    </LinearLayout>
+
+</ScrollView>

@@ -16,7 +16,7 @@
         android:text="Tu Horario semanal"
         android:textAlignment="center"
         android:textColor="@android:color/white"
-        android:textSize="23dp"
+        android:textSize="23sp"
         android:paddingTop="15dp"
         android:paddingBottom="15dp" />
 
@@ -25,8 +25,7 @@
         android:layout_height="1dp"
         android:background="#76737B"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        />
+        android:layout_marginBottom="8dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewDays"
@@ -43,8 +42,6 @@
         app:itemTextColor="@android:color/white"
         app:labelVisibilityMode="unlabeled"
         app:menu="@menu/navbar"
-        app:itemIconSize="40dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:itemIconSize="40dp" />
 
 </LinearLayout>

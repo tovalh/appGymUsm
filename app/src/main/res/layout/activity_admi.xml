@@ -3,20 +3,30 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@android:color/white">
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <!-- Agregado padding superior al layout principal -->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <!-- Botón de ajustes modificado -->
     <ImageButton
         android:id="@+id/btnAjustes"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
-        android:layout_marginLeft="5dp"
-        android:layout_marginRight="10dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_gravity="right"
-        android:src="@drawable/ajuste"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
         android:background="?android:selectableItemBackgroundBorderless"
+        android:contentDescription="Cerrar"
         android:scaleType="fitCenter"
-        android:contentDescription="Cerrar" />
+        android:src="@drawable/ajuste" />
 
+    <!-- El resto del layout continúa igual -->
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -24,8 +34,8 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center_horizontal">
+            android:layout_gravity="center_horizontal"
+            android:orientation="horizontal">
 
             <Button
                 android:id="@+id/btnLunes"
@@ -97,16 +107,14 @@
 
         </LinearLayout>
 
-
     </HorizontalScrollView>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="#76737B"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        />
+        android:background="#76737B" />
 
     <TextView
         android:id="@+id/txtDiaSemana"
@@ -127,11 +135,10 @@
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:background="@drawable/spiner_style"
+        android:dropDownWidth="match_parent"
         android:paddingStart="16dp"
         android:paddingEnd="32dp"
         android:spinnerMode="dropdown" />
-
-
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerAdmi"
@@ -139,17 +146,15 @@
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-
-
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#065F97"
+        app:itemIconSize="40dp"
         app:itemIconTint="@android:color/white"
         app:itemTextColor="@android:color/white"
         app:labelVisibilityMode="unlabeled"
-        app:menu="@menu/navbar"
-        app:itemIconSize="40dp" />
+        app:menu="@menu/navbar" />
 
 </LinearLayout>

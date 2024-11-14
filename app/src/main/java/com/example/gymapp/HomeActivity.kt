@@ -1,9 +1,11 @@
 package com.example.gymapp
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.gymapp.model.Reserva
@@ -60,13 +62,14 @@ class HomeActivity : AppCompatActivity() {
         database = FirebaseDatabase.getInstance().reference
     }
 
+    @SuppressLint("WrongViewCast")
     private fun setupButtons() {
         val reservaHorarioBoton = findViewById<Button>(R.id.btnReserva)
         reservaHorarioBoton.setOnClickListener {
             irReservas()
         }
 
-        val botonAdmi = findViewById<Button>(R.id.botonAdmi)
+        val botonAdmi = findViewById<ImageButton>(R.id.botonAdmi)
         botonAdmi.visibility = if (userIsAdmin) android.view.View.VISIBLE else android.view.View.GONE
 
         if (userIsAdmin) {

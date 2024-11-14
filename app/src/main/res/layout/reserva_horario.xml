@@ -6,9 +6,11 @@
     android:orientation="vertical"
     android:background="@android:color/white">
 
+
     <HorizontalScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:scrollbars="none">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -86,15 +88,15 @@
 
         </LinearLayout>
 
-
     </HorizontalScrollView>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#76737B"
         android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp"
-        />
+        android:layout_marginBottom="8dp" />
+
     <TextView
         android:id="@+id/txtDiaSemana"
         android:layout_width="wrap_content"
@@ -114,8 +116,8 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/ConfirmabtnReserva"
-        android:layout_width="300dp"
-        android:layout_height="60dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_margin="16dp"
         android:background="@drawable/botonredondo"
@@ -124,12 +126,8 @@
         android:textAlignment="center"
         android:textColor="#000000"
         android:textSize="18sp"
-
         app:backgroundTint="#FFA500"
-        app:cornerRadius="24dp"
-
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:cornerRadius="24dp" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigation"
