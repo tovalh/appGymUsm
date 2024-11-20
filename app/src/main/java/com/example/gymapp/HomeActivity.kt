@@ -242,7 +242,7 @@ class HomeActivity : AppCompatActivity() {
         val tvBloque = findViewById<TextView>(R.id.tvBloque)
         val tvDiaLunes = findViewById<TextView>(R.id.tvDiaLunes)
 
-        tvBloque.text = "Sin reservas próximas"
-        tvDiaLunes.text = "Reserva tu próxima clase"
+        tvBloque.text = "Reserva Bloque "
+        tvDiaLunes.text = "Reserva tu Dia"
     }
 }

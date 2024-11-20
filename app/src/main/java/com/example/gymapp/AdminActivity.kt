@@ -59,7 +59,7 @@ class AdminActivity : AppCompatActivity() {
 
         initializeRecyclerView()
         crearSpinner()
-        botonMenu()
+            botonMenu()
         setupButtons()
         initializeTextView()
 //        bloquearBotones()
@@ -382,6 +382,9 @@ class AdminActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.btnAjustes).setOnClickListener {
             showAjustesDialog()
         }
+        findViewById<Button>(R.id.btnLunes).setOnClickListener {
+            filterbloqueHorarios("Lunes")
+        }
 
         findViewById<Button>(R.id.btnMartes).setOnClickListener {
             filterbloqueHorarios("Martes")
@@ -528,41 +531,41 @@ class AdminActivity : AppCompatActivity() {
 
 
     private fun botonMenu() {
-        val menuNavegacion = findViewById<BottomNavigationView>(R.id.bottomNavigation)
+       val menuNavegacion = findViewById<BottomNavigationView>(R.id.bottomNavigation)
 
-        menuNavegacion.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.nav_home -> {
-                    val intentHome = Intent(this, HomeActivity::class.java)
-                    intentHome.putExtra("userEmail", userEmail)
-                    intentHome.putExtra("userName", userName)
-                    intentHome.putExtra("userIsAdmin", userIsAdmin)
-                    startActivity(intentHome)
-                    true
-                }
+      menuNavegacion.setOnItemSelectedListener { item ->
+          when (item.itemId) {
+              R.id.nav_home -> {
+                  val intentHome = Intent(this, HomeActivity::class.java)
+                  intentHome.putExtra("userEmail", userEmail)
+                  intentHome.putExtra("userName", userName)
+                  intentHome.putExtra("userIsAdmin", userIsAdmin)
+                  startActivity(intentHome)
+                  true
+              }
 
-                R.id.nav_calendar -> {
-                    val intentCalendar = Intent(this, ReservasActivity::class.java)
-                    intentCalendar.putExtra("userEmail", userEmail)
-                    intentCalendar.putExtra("userName", userName)
-                    intentCalendar.putExtra("userIsAdmin", userIsAdmin)
-                    startActivity(intentCalendar)
-                    true
-                }
+              R.id.nav_calendar -> {
+                  val intentCalendar = Intent(this, ReservasActivity::class.java)
+                  intentCalendar.putExtra("userEmail", userEmail)
+                  intentCalendar.putExtra("userName", userName)
+                intentCalendar.putExtra("userIsAdmin", userIsAdmin)
+                  startActivity(intentCalendar)
+                  true
+              }
 
-                R.id.nav_clock -> {
-                    val intentReloj = Intent(this, HorarioActivity::class.java)
-                    intentReloj.putExtra("userEmail", userEmail)
-                    intentReloj.putExtra("userName", userName)
-                    intentReloj.putExtra("userIsAdmin", userIsAdmin)
-                    startActivity(intentReloj)
-                    true
-                }
+              R.id.nav_clock -> {
+                  val intentReloj = Intent(this, HorarioActivity::class.java)
+                  intentReloj.putExtra("userEmail", userEmail)
+                  intentReloj.putExtra("userName", userName)
+                  intentReloj.putExtra("userIsAdmin", userIsAdmin)
+                  startActivity(intentReloj)
+                  true
+              }
 
-                else -> false
-            }
-        }
-    }
+              else -> false
+          }
+      }
+     }
 
     private fun filterbloqueHorarios(dia: String) {
         currentDaySelected = dia

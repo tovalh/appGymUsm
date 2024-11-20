@@ -1,13 +1,12 @@
+// LoginActivity.kt
 package com.example.gymapp
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.gymapp.model.Usuario
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -15,10 +14,6 @@ import com.google.firebase.database.ValueEventListener
 
 class LoginActivity : AppCompatActivity() {
     private val database = FirebaseDatabase.getInstance().reference
-
-    private var userEmail: String? = null
-    private var userName: String? = null
-    private var userIsAdmin: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,47 +36,50 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginUser(email: String, password: String) {
-        database.child("users").child(email.replace(".", "_")).addListenerForSingleValueEvent(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                if (snapshot.exists()) {
-                    // Leer valores directamente del snapshot
-                    val dbPassword = snapshot.child("password").getValue(String::class.java)
-                    val dbIsAdmin = snapshot.child("isAdmin").getValue(Boolean::class.java) ?: false
-                    val dbUsername = snapshot.child("username").getValue(String::class.java) ?: ""
+        // Validación básica de campos
+        if (email.isEmpty() || password.isEmpty()) {
+            Toast.makeText(this, "Por favor, complete todos los campos", Toast.LENGTH_SHORT).show()
+            return
+        }
 
-                    Log.d("LoginActivity", "Valores leídos - isAdmin: $dbIsAdmin, username: $dbUsername")
+        // Sanitizar el email para usarlo como clave en Firebase
+        val sanitizedEmail = email.replace(".", "_")
 
-                    if (dbPassword == password) {
-                        userEmail = email
-                        userName = dbUsername
-                        userIsAdmin = dbIsAdmin
+        database.child("users").child(sanitizedEmail)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        val dbPassword = snapshot.child("password").getValue(String::class.java)
+                        val dbIsAdmin = snapshot.child("isAdmin").getValue(Boolean::class.java) ?: false
+                        val dbUsername = snapshot.child("username").getValue(String::class.java) ?: ""
 
-                        if (userIsAdmin) {
-                            Toast.makeText(this@LoginActivity, "Bienvenido administrador $userName", Toast.LENGTH_SHORT).show()
+                        if (dbPassword == password) {
+                            // Inicio de sesión exitoso
+                            redirectUser(email, dbUsername, dbIsAdmin)
                         } else {
-                            Toast.makeText(this@LoginActivity, "Bienvenido usuario $userName", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this@LoginActivity, "Contraseña incorrecta", Toast.LENGTH_SHORT).show()
                         }
-
-                        startHomeActivity()
                     } else {
-                        Toast.makeText(this@LoginActivity, "Credenciales inválidas", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@LoginActivity, "Usuario no encontrado", Toast.LENGTH_SHORT).show()
                     }
-                } else {
-                    Toast.makeText(this@LoginActivity, "Usuario no encontrado", Toast.LENGTH_SHORT).show()
                 }
-            }
 
-            override fun onCancelled(error: DatabaseError) {
-                Toast.makeText(this@LoginActivity, "Error de inicio de sesión: $error", Toast.LENGTH_SHORT).show()
-            }
-        })
+                override fun onCancelled(error: DatabaseError) {
+                    Toast.makeText(this@LoginActivity, "Error de conexión", Toast.LENGTH_SHORT).show()
+                }
+            })
     }
 
-    private fun startHomeActivity() {
-        val intent = Intent(this, HomeActivity::class.java)
-        intent.putExtra("userEmail", userEmail)
-        intent.putExtra("userName", userName)
-        intent.putExtra("userIsAdmin", userIsAdmin)
+    private fun redirectUser(email: String, username: String, isAdmin: Boolean) {
+        val intent = Intent(this,
+            if (isAdmin) AdminActivity::class.java
+            else HomeActivity::class.java
+        )
+
+        intent.putExtra("userEmail", email)
+        intent.putExtra("userName", username)
+        intent.putExtra("userIsAdmin", isAdmin)
+
         startActivity(intent)
         finish()
     }
